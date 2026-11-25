@@ -465,6 +465,63 @@ body.sheet-open .fab, body.sheet-open .fab-bub{display:none !important}
 .ai-in input{flex:1 1 auto; height:44px; border-radius:13px; border:1px solid var(--line2); background:rgba(255,255,255,.05); padding:0 13px; font-size:13.5px; min-width:0}
 .ai-in button{flex:0 0 auto; width:48px; height:44px; border-radius:13px; background:linear-gradient(180deg,#f0c675,#d9a651); color:#2a1c06; font-size:17px; font-weight:900}
 .ai-in button:disabled{opacity:.5}
+
+/* ---------- shopping board ---------- */
+.gift{position:relative; overflow:hidden; padding:13px 14px 12px; background:linear-gradient(160deg,#1b2739,#0c1624 66%); border-color:rgba(227,180,100,.28)}
+.gift:before{content:""; position:absolute; inset:-46% -26% auto auto; width:230px; height:230px; border-radius:50%; background:radial-gradient(circle,rgba(227,180,100,.17),transparent 68%); pointer-events:none}
+.gift-hd{display:flex; align-items:center; gap:9px; position:relative}
+.gift-hd img{width:42px; height:42px; border-radius:50%; border:1.5px solid var(--goldline); box-shadow:0 0 0 3px rgba(227,180,100,.12); flex:0 0 auto}
+.gift-hd .gw{flex:1 1 auto; min-width:0}
+.gift-hd .gw b{display:block; font-size:13.5px; font-weight:900; letter-spacing:-.2px}
+.gift-hd .gw span{display:block; font-size:10.5px; color:var(--ink3); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.gift-timer{flex:0 0 auto; display:flex; align-items:center; gap:4px; font-size:10.5px; font-weight:800; color:var(--gold);
+  background:var(--goldbg); border:1px solid var(--goldline); border-radius:999px; padding:4px 9px; font-variant-numeric:tabular-nums}
+.gift-timer i{width:5px; height:5px; border-radius:50%; background:var(--gold); display:inline-block; animation:giftPulse 1.6s ease-in-out infinite}
+@keyframes giftPulse{0%,100%{opacity:1} 50%{opacity:.2}}
+.gift-item{position:relative; margin-top:11px; padding:11px 12px; border-radius:13px; background:rgba(255,255,255,.045); border:1px solid var(--line)}
+.gift-item .cat{display:inline-flex; align-items:center; gap:4px; font-size:9.5px; font-weight:800; padding:2px 7px; border-radius:999px}
+.gift-item .nm{font-size:15.5px; font-weight:900; letter-spacing:-.35px; line-height:1.35; margin-top:6px; overflow-wrap:anywhere}
+.gift-item .pr{font-size:12.5px; font-weight:800; color:var(--gold); margin-top:4px; font-variant-numeric:tabular-nums}
+.gift-item .pr s{text-decoration:none; color:var(--ink3); font-weight:700; font-size:11px}
+.gift-item .wh{font-size:11.5px; color:var(--ink2); margin-top:4px; overflow-wrap:anywhere}
+.gift-item .tp{font-size:12px; color:#dbe7f5; margin-top:8px; padding-top:8px; border-top:1px dashed rgba(255,255,255,.1); line-height:1.5}
+.gift-acts{display:flex; gap:7px; margin-top:10px; position:relative}
+.gift-acts .btn{flex:1 1 0}
+.gift-foot{display:flex; align-items:center; gap:6px; margin-top:9px; font-size:10px; color:var(--ink3); position:relative}
+.gift-foot .dot{width:3px; height:3px; border-radius:50%; background:var(--ink3); display:inline-block}
+.gift-wait{display:flex; align-items:center; gap:8px; font-size:12px; color:var(--ink2); padding:14px 2px}
+.shop-sum{display:flex; align-items:center; gap:7px; margin-bottom:12px}
+.shop-sum .st{flex:1 1 0; min-width:0; background:linear-gradient(180deg,var(--card),var(--bg2)); border:1px solid var(--line); border-radius:13px; padding:9px 10px}
+.shop-sum .st .k{font-size:10px; color:var(--ink3); font-weight:800; letter-spacing:.2px}
+.shop-sum .st .v{font-size:16px; font-weight:900; margin-top:2px; letter-spacing:-.5px; font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.shop-sum .st .s{font-size:9.5px; color:var(--ink3); margin-top:1px; font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.shop-sum .st.done .v{color:var(--green)}
+.shop-sum .st.money{flex:1.35 1 0}
+.shop-sum .st.money .v{color:var(--gold); font-size:15px}
+.sp{display:flex; gap:10px; align-items:flex-start; padding:11px 12px; border-radius:14px; background:linear-gradient(180deg,var(--card),var(--bg2)); border:1px solid var(--line); margin-bottom:9px}
+.sp.on{opacity:.7}
+.sp .bx{flex:0 0 auto; width:22px; height:22px; border-radius:7px; border:1.6px solid var(--line2); display:flex; align-items:center; justify-content:center; font-size:12px; color:transparent; background:rgba(255,255,255,.03); margin-top:1px}
+.sp.on .bx{background:var(--green); border-color:var(--green); color:#06251a}
+.sp .bd{flex:1 1 auto; min-width:0}
+.sp .nm{font-size:14px; font-weight:800; letter-spacing:-.3px; display:flex; align-items:center; gap:5px; flex-wrap:wrap; overflow-wrap:anywhere}
+.sp.on .nm .tx{text-decoration:line-through; color:var(--ink3)}
+.sp .nm .cat{font-size:9px; font-weight:800; padding:1px 6px; border-radius:999px; white-space:nowrap}
+.sp .meta{display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-top:4px; font-size:11px; color:var(--ink2); font-variant-numeric:tabular-nums}
+.sp .meta b{color:var(--ink); font-weight:800}
+.sp .meta .req{font-size:9.5px; font-weight:800; padding:1px 6px; border-radius:999px; background:var(--bluebg); color:var(--blue); border:1px solid rgba(95,168,255,.3)}
+.sp .memo{font-size:11px; color:#cfdced; margin-top:5px; background:rgba(255,255,255,.04); border-radius:8px; padding:5px 8px; overflow-wrap:anywhere; line-height:1.45}
+.sp .pic{width:46px; height:46px; border-radius:10px; object-fit:cover; border:1px solid var(--line2); flex:0 0 auto}
+.sp .acts{display:flex; gap:5px; margin-top:7px}
+.sh-prev{display:flex; align-items:center; gap:9px; margin-top:7px}
+.sh-prev img{width:56px; height:56px; border-radius:10px; object-fit:cover; border:1px solid var(--line2)}
+.sh-prev button{font-size:11px; font-weight:800; color:var(--red); background:var(--redbg); border:1px solid rgba(255,122,107,.3); border-radius:8px; padding:5px 9px}
+.sh-prev label{display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:800; color:var(--ink2); background:rgba(255,255,255,.05); border:1px solid var(--line2); border-radius:9px; padding:6px 10px}
+.seg.two{grid-template-columns:repeat(2,1fr)}
+.done-row{display:flex; align-items:center; gap:9px; padding:10px 11px; border-radius:11px; background:rgba(255,255,255,.04); border:1px solid var(--line2)}
+.done-row .bx{width:20px; height:20px; border-radius:6px; border:1.6px solid var(--line2); display:flex; align-items:center; justify-content:center; font-size:11px; color:transparent; background:rgba(255,255,255,.03); flex:0 0 auto}
+.done-row.on{background:var(--greenbg); border-color:rgba(95,211,154,.34)}
+.done-row.on .bx{background:var(--green); border-color:var(--green); color:#06251a}
+.done-row span{font-size:12.5px; font-weight:800}
 </style>
 </head>
 <body>
@@ -630,6 +687,46 @@ body.sheet-open .fab, body.sheet-open .fab-bub{display:none !important}
     </div>
   </section>
 
+  <!-- ================= SHOPPING ================= -->
+  <section class="page" id="pgShop" hidden>
+    <div class="card gift" id="giftCard">
+      <div class="gift-hd">
+        <img src="./assets/arabman-avatar.png" alt="아랍맨">
+        <div class="gw">
+          <b>아랍맨의 선물 추천</b>
+          <span id="giftSrc">60초마다 새 추천 · AI 기반</span>
+        </div>
+        <span class="gift-timer" id="giftTimer"><i></i><span id="giftLeft">60초</span></span>
+      </div>
+      <div id="giftBody">
+        <div class="gift-item"><div class="gift-wait"><span class="spin"></span>아랍맨이 선물을 고르는 중…</div></div>
+      </div>
+      <div class="gift-acts">
+        <button class="btn sm primary" id="giftAdd">＋ 위시리스트에 담기</button>
+        <button class="btn sm ghost" id="giftNext">↻ 다른 추천</button>
+      </div>
+      <div class="gift-foot"><span id="giftMeta">AI가 매번 새 품목을 골라 줘</span></div>
+    </div>
+
+    <div class="ph"><h2>두바이 쇼핑 · 선물 체크</h2><span class="sp"></span><button class="mini" id="shopAddTop">+ 품목 추가</button></div>
+    <div class="shop-sum" id="shopSum">
+      <div class="st"><div class="k">전체</div><div class="v" id="sumAll">0개</div><div class="s" id="sumDoneSub">—</div></div>
+      <div class="st done"><div class="k">구매 완료</div><div class="v" id="sumDone">0개</div><div class="s" id="sumBar">0%</div></div>
+      <div class="st money"><div class="k">예상 총액</div><div class="v" id="sumAed">0 AED</div><div class="s" id="sumKrw">₩0</div></div>
+    </div>
+    <div class="chips" id="shopFilters">
+      <button class="chip on" data-scat="all">전체</button>
+      <button class="chip" data-scat="초콜릿·디저트">🍫 초콜릿·디저트</button>
+      <button class="chip" data-scat="향수·뷰티">🧴 향수·뷰티</button>
+      <button class="chip" data-scat="면세점">🛍️ 면세점</button>
+      <button class="chip" data-scat="기념품·기타">🎁 기념품·기타</button>
+      <button class="chip" data-scat="남은 것">☐ 남은 것</button>
+      <button class="chip" data-scat="산 것">✓ 산 것</button>
+    </div>
+    <div id="shopList"></div>
+    <div style="height:6px"></div>
+  </section>
+
   <!-- ================= COUPLE ================= -->
   <section class="page" id="pgCouple" hidden>
     <div class="ph">
@@ -732,6 +829,7 @@ body.sheet-open .fab, body.sheet-open .fab-bub{display:none !important}
   <button data-pg="home" class="on"><span class="ic">🏠</span>홈</button>
   <button data-pg="places"><span class="ic">📍</span>장소</button>
   <button data-pg="map"><span class="ic">🗺️</span>지도</button>
+  <button data-pg="shop"><span class="ic">🛍️</span>쇼핑</button>
   <button data-pg="couple"><span class="ic">💌</span>커플</button>
   <button data-pg="extra"><span class="ic">🧭</span>생존</button>
 </nav>
@@ -782,6 +880,67 @@ body.sheet-open .fab, body.sheet-open .fab-bub{display:none !important}
     <div class="sheet-foot">
       <button class="btn primary" id="psSave">저장</button>
       <button class="btn danger" id="psDel" hidden>삭제</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ shop sheet ============ -->
+<div class="sheet" id="shopSheet" hidden>
+  <div class="sheet-in">
+    <div class="sheet-hd"><b id="shTitle">품목 추가</b><button class="x" id="shClose">✕</button></div>
+    <div class="field">
+      <label>카테고리</label>
+      <div class="seg two" id="shCat">
+        <button data-scat="초콜릿·디저트" class="on"><span class="e">🍫</span>초콜릿·디저트</button>
+        <button data-scat="향수·뷰티"><span class="e">🧴</span>향수·뷰티</button>
+        <button data-scat="면세점"><span class="e">🛍️</span>면세점</button>
+        <button data-scat="기념품·기타"><span class="e">🎁</span>기념품·기타</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>품목명 *</label>
+      <input id="shName" placeholder="예: 바테일 대추야자 초콜릿" maxlength="80">
+    </div>
+    <div class="field">
+      <label>예상 가격 (AED · 입력하면 원화로 환산)</label>
+      <div class="f2">
+        <input id="shPrice" type="text" inputmode="decimal" placeholder="AED" autocomplete="off">
+        <input id="shPriceKrw" type="text" readonly placeholder="₩" tabindex="-1" style="color:var(--gold);font-weight:800">
+      </div>
+    </div>
+    <div class="field">
+      <label>수량</label>
+      <input id="shQty" type="number" inputmode="numeric" min="1" max="99" value="1">
+    </div>
+    <div class="field">
+      <label>요청자 / 태그</label>
+      <input id="shReq" placeholder="예: 영진 부탁 / 건우 픽" maxlength="30">
+      <div class="quick" style="margin-top:7px">
+        <button data-sreq="영진 부탁">영진 부탁</button>
+        <button data-sreq="건우 픽">건우 픽</button>
+        <button data-sreq="공용">공용</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>메모 (구매처 · 품절 대안)</label>
+      <textarea id="shMemo" placeholder="예: 두바이몰 1층 바테일, 품절이면 공항 면세점" maxlength="400"></textarea>
+    </div>
+    <div class="field">
+      <label>사진 (선택)</label>
+      <div class="sh-prev">
+        <label for="shFile">📷 사진 첨부</label>
+        <input id="shFile" type="file" accept="image/*" hidden>
+        <img id="shPrev" alt="첨부 사진" hidden>
+        <button id="shPrevDel" type="button" hidden>삭제</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>구매 상태</label>
+      <button class="done-row" id="shDone" type="button"><span class="bx">✓</span><span>구매 완료로 표시</span></button>
+    </div>
+    <div class="sheet-foot">
+      <button class="btn primary" id="shSave">저장</button>
+      <button class="btn danger" id="shDel" hidden>삭제</button>
     </div>
   </div>
 </div>
@@ -1073,7 +1232,7 @@ function convKrw2Aed(){
 }
 
 /* ================= data layer ================= */
-const DB={mode:'local', places:[], notes:[], ck:[], ready:false, busy:false};
+const DB={mode:'local', places:[], notes:[], ck:[], shop:[], shopLocal:false, ready:false, busy:false};
 function lsGet(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } }
 function lsSet(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
 
@@ -1126,15 +1285,19 @@ async function refreshAll(first){
   if(DB.busy) return; DB.busy=true;
   try{
     if(DB.mode==='cloud'){
-      const [p,n,k]=await Promise.all([
+      const [p,n,k,s]=await Promise.all([
         sb('dubai_places?select=*&order=created_at.asc'),
         sb('dubai_notes?select=*&order=created_at.asc&limit=400'),
-        sb('dubai_checklist?select=*&order=id.asc')
+        sb('dubai_checklist?select=*&order=id.asc'),
+        sb('dubai_shopping?select=*&order=id.asc').catch(e=>{ if(missingTable(e)){ DB.shopLocal=true; return null; } throw e; })
       ]);
       DB.places=p||[]; DB.notes=n||[]; DB.ck=k||[];
+      DB.shop=(s===null)?lsGet('dubai.shop',[]):(s||[]);
+      if(DB.shopLocal) lsSet('dubai.shop',DB.shop);
       if(!DB.ck.length){ await seedChecklist(); }
     } else {
       DB.places=lsGet('dubai.places',[]); DB.notes=lsGet('dubai.notes',[]); DB.ck=lsGet('dubai.ck',[]);
+      DB.shop=lsGet('dubai.shop',[]);
       if(!DB.ck.length){ DB.ck=CK_DEFAULT.map((x,i)=>({id:i+1,label:x[0],done:x[1],author:'기본'})); lsSet('dubai.ck',DB.ck); }
       lsSet('dubai.places',DB.places); lsSet('dubai.notes',DB.notes);
     }
@@ -1150,7 +1313,7 @@ async function seedChecklist(){
 }
 
 function renderAll(first){
-  renderPlaces(); renderHomePlaces(); renderMapPins(); renderChecklist(); renderChat(); renderAlbum(); renderTaxi();
+  renderPlaces(); renderHomePlaces(); renderMapPins(); renderChecklist(); renderChat(); renderAlbum(); renderTaxi(); renderShop();
   if(first){ paintWho(); }
 }
 
@@ -1420,8 +1583,8 @@ function compressImage(file){
     img.src=url;
   });
 }
-async function uploadPhoto(blob){
-  const path='chat/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.jpg';
+async function uploadPhoto(blob,folder){
+  const path=(folder||'chat')+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.jpg';
   const r=await fetch(SUPA+'/storage/v1/object/'+BUCKET+'/'+path,{
     method:'POST',
     headers:sbHeaders({'Content-Type':'image/jpeg','cache-control':'31536000','x-upsert':'false'}),
@@ -1515,9 +1678,14 @@ function openTaxi(id){
 /* ================= nav ================= */
 function go(page){
   stopPhrase();
-  const map={home:'#pgHome',places:'#pgPlaces',map:'#pgMap',couple:'#pgCouple',extra:'#pgExtra'};
+  const map={home:'#pgHome',places:'#pgPlaces',map:'#pgMap',shop:'#pgShop',couple:'#pgCouple',extra:'#pgExtra'};
   Object.keys(map).forEach(k=>{ const s=$(map[k]); if(s) s.hidden=(k!==page); });
   $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.pg===page));
+  if(page==='shop'){
+    if(!gift.tip && !gift.busy) giftFetch();
+    else if(Date.now()-(gift.at||0)>60000) giftFetch();
+    gift.left=60; giftPaintTimer();
+  }
   if(page==='map'){
     if(!mapState.map) initMap();
     setTimeout(()=>{ try{ mapState.map.invalidateSize(); renderMapPins(true); }catch(e){} },80);
@@ -1899,6 +2067,167 @@ async function addRec(i){
 }
 
 
+/* ================= shopping board ================= */
+const SHOP_CATS={
+  '초콜릿·디저트':{e:'🍫', c:'#ffa26b', bg:'rgba(255,162,107,.14)', bd:'rgba(255,162,107,.34)'},
+  '향수·뷰티':{e:'🧴', c:'#c3a6ff', bg:'rgba(195,166,255,.14)', bd:'rgba(195,166,255,.34)'},
+  '면세점':{e:'🛍️', c:'#5fa8ff', bg:'rgba(95,168,255,.14)', bd:'rgba(95,168,255,.34)'},
+  '기념품·기타':{e:'🎁', c:'#5fd39a', bg:'rgba(95,211,154,.14)', bd:'rgba(95,211,154,.34)'}
+};
+const shopUI={cat:'all', editing:null, done:false, photo:null, file:null, cleared:false};
+function shopCat(c){ return SHOP_CATS[c]||SHOP_CATS['기념품·기타']; }
+function shopCloud(){ return DB.mode==='cloud' && !DB.shopLocal; }
+
+function renderShop(){
+  const list=DB.shop||[];
+  const doneCount=list.filter(x=>x.done).length;
+  const sumAed=list.reduce((s,x)=>s+(Number(x.price_aed)||0)*(Number(x.qty)||1),0);
+  const pct=list.length?Math.round(doneCount/list.length*100):0;
+  const sa=$('#sumAll'), sd=$('#sumDone'), sm=$('#sumAed'), sk=$('#sumKrw');
+  if(!sa) return;
+  sa.textContent=list.length+'개';
+  $('#sumDoneSub').textContent='남은 '+(list.length-doneCount)+'개';
+  sd.textContent=doneCount+'개';
+  $('#sumBar').textContent=pct+'%';
+  sm.textContent=nf(Math.round(sumAed))+' AED';
+  sk.textContent='₩'+nf(Math.round(sumAed*rate.val));
+
+  const f=shopUI.cat;
+  let arr=list.slice();
+  if(f==='남은 것') arr=arr.filter(x=>!x.done);
+  else if(f==='산 것') arr=arr.filter(x=>x.done);
+  else if(f!=='all') arr=arr.filter(x=>x.category===f);
+  arr.sort((a,b)=>(a.done?1:0)-(b.done?1:0)||((+a.id||0)-(+b.id||0)));
+
+  const box=$('#shopList');
+  if(!arr.length){
+    box.innerHTML='<div class="card tight"><div class="empty"><div class="big">🛍️</div>'
+      +(list.length?'이 조건에 맞는 품목이 없어.':'아직 담은 게 없어.<br>위 아랍맨 추천에서 <b>위시리스트에 담기</b>를 누르거나<br>직접 품목을 추가해 봐.')
+      +'</div></div>';
+    return;
+  }
+  box.innerHTML=arr.map(x=>{
+    const c=shopCat(x.category);
+    const aed=x.price_aed==null||x.price_aed===''?null:Number(x.price_aed);
+    const qty=Number(x.qty)||1;
+    return '<div class="sp '+(x.done?'on':'')+'">'
+      +'<button class="bx" data-shoptoggle="'+esc(x.id)+'" aria-label="구매 완료">✓</button>'
+      +(x.photo_url?'<img class="pic" src="'+esc(x.photo_url)+'" alt="사진" loading="lazy" data-lb="'+esc(x.photo_url)+'">':'')
+      +'<div class="bd">'
+        +'<div class="nm"><span class="tx">'+esc(x.name)+'</span>'
+          +'<span class="cat" style="color:'+c.c+';background:'+c.bg+';border:1px solid '+c.bd+'">'+c.e+' '+esc(x.category||'기념품·기타')+'</span></div>'
+        +'<div class="meta">'
+          +(aed!==null&&!isNaN(aed)
+            ?'<b>'+nf(aed)+' AED</b>'+(qty>1?'<span>× '+qty+' = '+nf(aed*qty)+' AED</span>':'')+'<span class="dim">· ₩'+nf(Math.round(aed*qty*rate.val))+'</span>'
+            :'<span class="dim">가격 미정</span>')
+          +(x.requester?'<span class="req">'+esc(x.requester)+'</span>':'')
+        +'</div>'
+        +(x.memo?'<div class="memo">'+esc(x.memo)+'</div>':'')
+        +'<div class="acts">'
+          +'<button class="ia gold" data-shopedit="'+esc(x.id)+'">수정</button>'
+          +'<button class="ia red" data-shopdel="'+esc(x.id)+'">✕</button>'
+        +'</div>'
+      +'</div></div>';
+  }).join('');
+}
+
+function convShopPrice(){
+  const v=parseFloat(($('#shPrice').value||'').replace(/,/g,''));
+  $('#shPriceKrw').value=isNaN(v)?'':'₩'+nf(Math.round(v*rate.val));
+}
+function paintShopPhoto(){
+  const img=$('#shPrev'), del=$('#shPrevDel');
+  let src=null;
+  if(shopUI.file){ try{ src=URL.createObjectURL(shopUI.file); }catch(e){ src=null; } }
+  else if(shopUI.photo){ src=shopUI.photo; }
+  if(src){ img.src=src; img.hidden=false; del.hidden=false; }
+  else { img.hidden=true; del.hidden=true; img.removeAttribute('src'); }
+}
+function closeShopSheet(){
+  $('#shopSheet').hidden=true; document.body.classList.remove('sheet-open');
+  shopUI.editing=null; shopUI.file=null; shopUI.photo=null; shopUI.cleared=false;
+}
+function openShopSheet(it, preset){
+  shopUI.editing=it?it.id:null;
+  shopUI.file=null; shopUI.cleared=false;
+  shopUI.photo=it&&it.photo_url?it.photo_url:null;
+  shopUI.done=!!(it&&it.done);
+  $('#shTitle').textContent=it?'품목 수정':'품목 추가';
+  $('#shName').value=it?it.name:(preset&&preset.name?preset.name:'');
+  $('#shPrice').value=it&&it.price_aed!=null?String(Number(it.price_aed)):(preset&&preset.price_aed!=null?String(preset.price_aed):'');
+  $('#shQty').value=it?(it.qty||1):(preset&&preset.qty?preset.qty:1);
+  $('#shReq').value=it?(it.requester||''):(preset&&preset.requester?preset.requester:'');
+  $('#shMemo').value=it?(it.memo||''):(preset&&preset.memo?preset.memo:'');
+  const cat=(it&&it.category)||(preset&&preset.category)||'기념품·기타';
+  $$('#shCat button').forEach(b=>b.classList.toggle('on',b.dataset.scat===cat));
+  $('#shDone').classList.toggle('on',shopUI.done);
+  $('#shDel').hidden=!it;
+  $('#shFile').value='';
+  paintShopPhoto(); convShopPrice();
+  $('#shopSheet').hidden=false; document.body.classList.add('sheet-open');
+  setTimeout(()=>{ try{ $('#shName').focus(); }catch(e){} },140);
+}
+async function saveShop(){
+  const name=$('#shName').value.trim();
+  if(!name){ toast('품목명을 넣어 줘'); $('#shName').focus(); return; }
+  const catEl=$('#shCat .on');
+  const cat=catEl?catEl.dataset.scat:'기념품·기타';
+  const pRaw=($('#shPrice').value||'').replace(/[,\s]/g,'').trim();
+  const price=pRaw===''?null:Number(pRaw);
+  if(price!==null && (isNaN(price)||price<0)){ toast('가격을 숫자로 넣어 줘'); $('#shPrice').focus(); return; }
+  const qty=Math.max(1,Math.min(99,parseInt($('#shQty').value,10)||1));
+  const btn=$('#shSave'); const label=btn.textContent;
+  btn.disabled=true; btn.textContent='저장 중…';
+  try{
+    let photo=shopUI.photo;
+    if(shopUI.file) photo=await uploadPhoto(await compressImage(shopUI.file),'shop');
+    else if(shopUI.cleared) photo=null;
+    const row={name, category:cat, price_aed:price, qty,
+      memo:$('#shMemo').value.trim()||null, requester:$('#shReq').value.trim()||null,
+      photo_url:photo, done:!!shopUI.done, author:who.name||null, updated_at:new Date().toISOString()};
+    if(shopUI.editing){
+      const id=shopUI.editing;
+      if(shopCloud()){
+        const up=await sbPatch('dubai_shopping',id,row);
+        const i=DB.shop.findIndex(x=>String(x.id)===String(id));
+        if(i>=0) DB.shop[i]=up||Object.assign({},DB.shop[i],row);
+      } else {
+        const i=DB.shop.findIndex(x=>String(x.id)===String(id));
+        if(i>=0) DB.shop[i]=Object.assign({},DB.shop[i],row);
+        lsSet('dubai.shop',DB.shop);
+      }
+      toast('수정했어');
+    } else {
+      if(shopCloud()){ const ins=await sbInsert('dubai_shopping',row); DB.shop.push(ins); }
+      else { row.id=localId(DB.shop); row.created_at=new Date().toISOString(); DB.shop.push(row); lsSet('dubai.shop',DB.shop); }
+      toast('위시리스트에 담았어');
+    }
+    closeShopSheet(); renderShop();
+  }catch(e){
+    console.warn(e); toast('저장 실패: '+String(e.message||'').slice(0,50));
+  }finally{
+    btn.disabled=false; btn.textContent=label;
+  }
+}
+async function toggleShop(id){
+  const it=(DB.shop||[]).find(x=>String(x.id)===String(id)); if(!it) return;
+  it.done=!it.done; renderShop();
+  try{
+    if(shopCloud()) await sbPatch('dubai_shopping',id,{done:it.done,updated_at:new Date().toISOString()});
+    else lsSet('dubai.shop',DB.shop);
+  }catch(e){ it.done=!it.done; renderShop(); toast('저장 실패'); }
+}
+async function delShop(id){
+  const it=(DB.shop||[]).find(x=>String(x.id)===String(id)); if(!it) return;
+  if(!confirm('“'+it.name+'”을(를) 목록에서 지울까요?')) return;
+  try{
+    if(shopCloud()) await sbDelete('dubai_shopping',id);
+    DB.shop=DB.shop.filter(x=>String(x.id)!==String(id));
+    if(!shopCloud()) lsSet('dubai.shop',DB.shop);
+    closeShopSheet(); renderShop(); toast('지웠어');
+  }catch(e){ toast('삭제 실패'); }
+}
+
 /* ================= arabman AI ================= */
 const AI_URL=SUPA+'/functions/v1/dubai-ai';
 const ai={history:[], busy:false, opened:false};
@@ -1994,14 +2323,141 @@ function aiBind(){
   try{ if(localStorage.getItem('dubai.bubOff')==='1') $('#aiBub').style.display='none'; }catch(e){}
 }
 
+/* ================= arabman gift tip (60s) ================= */
+const GIFT_LOCAL=[
+  {item:'바테일 대추야자 초콜릿', price_aed:120, where:'두바이몰 바테일(Bateel) 매장', category:'초콜릿·디저트', tip:'대추야자랑 피스타치오 조합, 선물로 제일 안전해.'},
+  {item:'알 나실 향수 오드퍼퓸', price_aed:95, where:'두바이몰·미르디프 시티센터', category:'향수·뷰티', tip:'우드향 좋아하면 이거 하나는 꼭 사 와.'},
+  {item:'장미수(Rose Water) 한 병', price_aed:18, where:'스피니스(Spinneys) 슈퍼', category:'기념품·기타', tip:'가볍고 안 깨져. 냉장고에 두고 쓰면 아랍 냄새 나지.'},
+  {item:'사프란 소포(2g)', price_aed:40, where:'스파이스 수크 · 카르푸', category:'기념품·기타', tip:'금값이긴 한데 2g이면 부담 없어. 향이 진짜야.'},
+  {item:'두바이 초콜릿(Fix Dessert)', price_aed:65, where:'두바이몰 1층 · 공항 T3', category:'초콜릿·디저트', tip:'요즘이 제일 잘 나가. 줄 길어도 사 와.'},
+  {item:'아랍식 커피 · 달라 포트 세트', price_aed:150, where:'알 파히디 전통시장', category:'기념품·기타', tip:'커피 좋아하면 이만한 게 없어. 집에 두면 분위기 산다.'},
+  {item:'나이오일(Lanvin) 향수', price_aed:310, where:'두바이 공항 면세점 T3', category:'면세점', tip:'면세가 한국보다 싸. 시향하고 결정해.'},
+  {item:'데이트 시럽 · 대추야자 박스', price_aed:35, where:'카르푸(Carrefour)', category:'초콜릿·디저트', tip:'아이스크림에 부으면 두바이 집이 돼.'},
+  {item:'칸두라 무늬 쿠션 · 장식품', price_aed:60, where:'골드 수크 기념품점', category:'기념품·기타', tip:'흥정하면 반값. 시작가에서 40% 빼고 불어.'},
+  {item:'오우드(Oud) 미니 스프레이', price_aed:130, where:'두바이몰 향수층', category:'향수·뷰티', tip:'사막 냄새 그대로. 한 번 뿌리면 하루 종일 가.'},
+  {item:'세라믹 아랍 컵 · 접시 세트', price_aed:75, where:'알 파히디 전통시장', category:'기념품·기타', tip:'품에 넣기 좋게 포장해 달라고 해.'},
+  {item:'캬멜 · 아랍 향신료 세트', price_aed:25, where:'스파이스 수크', category:'기념품·기타', tip:'고기 요리에 한 꼭 옮기면 두바이 온도 나. (냉장고 보관)'}
+];
+const gift={tip:null, busy:false, seen:[], left:60, at:0, err:'', src:''};
+
+function giftPaintTimer(){
+  const el=$('#giftLeft'); if(!el) return;
+  el.textContent=gift.busy?'갱신 중':String(Math.max(0,gift.left))+'초';
+}
+function giftRender(){
+  const box=$('#giftBody'); if(!box) return;
+  const t=gift.tip;
+  if(!t){
+    box.innerHTML='<div class="gift-item"><div class="gift-wait"><span class="spin"></span>'
+      +(gift.err?'아랍맨이 잠깐 모래바람을 만났어. 다시 시도할게.':'아랍맨이 선물을 고르는 중…')+'</div>'
+      +(gift.err?'<div class="gift-foot" style="margin-top:2px">'+esc(gift.err)+'</div>':'')
+      +'</div>';
+  } else {
+    const c=shopCat(t.category);
+    box.innerHTML='<div class="gift-item">'
+      +'<span class="cat" style="color:'+c.c+';background:'+c.bg+';border:1px solid '+c.bd+'">'+c.e+' '+esc(t.category||'기념품·기타')+'</span>'
+      +'<div class="nm">'+esc(t.item)+'</div>'
+      +'<div class="pr">'+(t.price_aed!=null?'약 '+nf(t.price_aed)+' AED <s>· ₩'+nf(Math.round(t.price_aed*rate.val))+'</s>':'가격 정보 없음')+'</div>'
+      +(t.where?'<div class="wh">📍 '+esc(t.where)+'</div>':'')
+      +(t.tip?'<div class="tp">“'+esc(t.tip)+'”</div>':'')
+      +'</div>';
+  }
+  $('#giftAdd').disabled=!t;
+  $('#giftMeta').textContent = (gift.err&&t)
+    ? ('방금 못 불러왔어 — '+gift.err)
+    : ('AI가 매번 새 품목을 골라 줘'+(gift.src?' · '+gift.src:''));
+  $('#giftSrc').textContent = gift.busy?'아랍맨이 새로 고르는 중…':'60초마다 새 추천 · AI 기반';
+  giftPaintTimer();
+}
+async function giftFetch(force){
+  if(gift.busy) return;
+  if(!force && document.visibilityState!=='visible') return;
+  gift.busy=true; gift.err=''; giftRender();
+  const ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
+  const tid=ctrl?setTimeout(()=>{ try{ ctrl.abort(); }catch(e){} },15000):null;
+  try{
+    const wish=(DB.shop||[]).map(x=>x.name).filter(Boolean).slice(-20);
+    const r=await fetch(AI_URL,{
+      method:'POST',
+      headers:sbHeaders({'Content-Type':'application/json'}),
+      body:JSON.stringify({mode:'gift_tip', seen:gift.seen.slice(-10), wishlist:wish}),
+      signal:ctrl?ctrl.signal:undefined
+    });
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok||!d.ok||!d.tip) throw new Error(String((d&&(d.detail||d.error))||('HTTP '+r.status)).slice(0,80));
+    gift.tip=d.tip;
+    gift.at=Date.now();
+    gift.src=(d.model?String(d.model).replace('models/',''):'gemini')+(d.ms?' · '+(d.ms/1000).toFixed(1)+'s':'');
+    if(d.tip.item){ gift.seen.push(d.tip.item); if(gift.seen.length>14) gift.seen=gift.seen.slice(-14); }
+  }catch(e){
+    gift.err=String((e&&e.message)||e).slice(0,70);
+    if(!gift.tip){
+      const f=GIFT_LOCAL[Math.floor(Math.random()*GIFT_LOCAL.length)];
+      gift.tip=f; gift.src='오프라인 추천';
+    }
+  }finally{
+    if(tid) clearTimeout(tid);
+    gift.busy=false; gift.left=60; giftRender();
+  }
+}
+function giftTick(){
+  if(!$('#pgShop')||$('#pgShop').hidden) return;         // 다른 탭에선 쉼
+  if(document.visibilityState!=='visible') return;       // 화면 꺼지면 쉼
+  if(gift.busy){ giftPaintTimer(); return; }
+  gift.left-=1;
+  if(gift.left<=0){ gift.left=60; giftPaintTimer(); giftFetch(true); return; }
+  giftPaintTimer();
+}
+async function addGiftToShop(){
+  const t=gift.tip; if(!t) return;
+  const memo=[t.where?'구매처: '+t.where:'', t.tip?'아랍맨: '+t.tip:''].filter(Boolean).join(' / ').slice(0,400);
+  const requester=who.name?(who.name==='영진'?'영진 부탁':'건우 픽'):null;
+  const ok=await addShopItem({name:t.item, category:t.category, price_aed:t.price_aed, qty:1, memo, requester});
+  if(ok){ toast('위시리스트에 담았어 — '+String(t.item).slice(0,20)); }
+}
+async function addShopItem(row){
+  const base={name:row.name, category:row.category||'기념품·기타',
+    price_aed:row.price_aed==null||row.price_aed===''?null:Number(row.price_aed),
+    qty:row.qty||1, memo:row.memo||null, requester:row.requester||null, photo_url:row.photo_url||null,
+    done:false, author:who.name||null, updated_at:new Date().toISOString()};
+  try{
+    if(shopCloud()){ const ins=await sbInsert('dubai_shopping',base); DB.shop.push(ins); }
+    else { base.id=localId(DB.shop); base.created_at=new Date().toISOString(); DB.shop.push(base); lsSet('dubai.shop',DB.shop); }
+    renderShop(); return true;
+  }catch(e){ console.warn(e); toast('담기 실패: '+String(e.message||'').slice(0,40)); return false; }
+}
+function bindShop(){
+  $('#shopAddTop').onclick=()=>{ if(!askWho(()=>openShopSheet(null))) return; openShopSheet(null); };
+  $('#shClose').onclick=closeShopSheet;
+  $('#shopSheet').addEventListener('click',e=>{ if(e.target.id==='shopSheet') closeShopSheet(); });
+  $('#shSave').onclick=saveShop;
+  $('#shDel').onclick=()=>{ if(shopUI.editing) delShop(shopUI.editing); };
+  $('#shCat').addEventListener('click',e=>{ const b=e.target.closest('[data-scat]'); if(!b) return; $$('#shCat button').forEach(x=>x.classList.toggle('on',x===b)); });
+  $('#shDone').onclick=()=>{ shopUI.done=!shopUI.done; $('#shDone').classList.toggle('on',shopUI.done); };
+  $('#shPrice').addEventListener('input',convShopPrice);
+  $('#shFile').addEventListener('change',e=>{ const f=(e.target.files||[])[0]; if(!f) return; shopUI.file=f; shopUI.cleared=false; paintShopPhoto(); });
+  $('#shPrevDel').onclick=()=>{ shopUI.file=null; shopUI.photo=null; shopUI.cleared=true; $('#shFile').value=''; paintShopPhoto(); };
+  $('#giftAdd').onclick=addGiftToShop;
+  $('#giftNext').onclick=()=>{ if(gift.busy) return; gift.left=60; giftFetch(true); };
+  document.body.addEventListener('click',e=>{
+    const st=e.target.closest('[data-shoptoggle]'); if(st){ toggleShop(st.dataset.shoptoggle); return; }
+    const se=e.target.closest('[data-shopedit]'); if(se){ const it=(DB.shop||[]).find(x=>String(x.id)===se.dataset.shopedit); if(it) openShopSheet(it); return; }
+    const sd=e.target.closest('[data-shopdel]'); if(sd){ delShop(sd.dataset.shopdel); return; }
+    const sr=e.target.closest('[data-sreq]'); if(sr){ $('#shReq').value=sr.dataset.sreq; return; }
+    const chip=e.target.closest('#shopFilters .chip'); if(chip){ $$('#shopFilters .chip').forEach(c=>c.classList.toggle('on',c===chip)); shopUI.cat=chip.dataset.scat; renderShop(); return; }
+  });
+}
+
 /* ================= boot ================= */
 function boot(){
   $('#heroSteps').innerHTML=buildSteps();
   $('#heroSteps').style.gridTemplateColumns='repeat(2,1fr)';
   tickClock(); setInterval(tickClock,1000);
-  loadWho(); renderPhrases(); bind(); aiBind(); warmVoices(); bindTranslator();
+  loadWho(); renderPhrases(); bind(); bindShop(); aiBind(); warmVoices(); bindTranslator();
   loadWeather(); loadRate();
   initDB();
+  setTimeout(()=>{ giftFetch(true); },1500);
+  setInterval(giftTick,1000);
   setInterval(()=>{ if(document.visibilityState==='visible') refreshAll(false); },20000);
   document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') refreshAll(false); });
   setInterval(()=>{ if(DB.mode!=='cloud') initDB(); },60000);

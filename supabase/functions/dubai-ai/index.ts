@@ -5,6 +5,7 @@
 // mode 생략     : 아랍맨 상담 채팅 (기존 동작 그대로)
 // mode:'translate': 실시간 번역기 — JSON 한 개만 반환
 // mode:'tts'    : 아랍어 문장 → 오디오(base64). 기기 음성팩 없이 재생되도록 서버에서 생성.
+// mode:'gift_tip': 아랍맨 선물 추천 한 건 — JSON 한 개만 반환(쇼핑 보드 60초 갱신용).
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -94,6 +95,77 @@ const TRANSLATE_SYSTEM_PROMPT = [
   '설명·인사·마크다운·코드펜스 없이 아래 JSON 객체 하나만 출력한다.',
   '{"arabic":"아랍어 원문","pronunciation":"아랍어를 로마자(라틴 알파벳)로 적은 발음","english":"영어 표현","tip":"한국어 한 줄 현지 팁(30자 이내)"}'
 ].join('\n');
+
+const GIFT_SYSTEM_PROMPT = [
+  '너는 "아랍맨"이다. 두바이 현지 사정에 훤한 유쾌한 AI 가이드로, 2026년 12월 5~12일 두바이 출장 중인 고건우 님과 집에서 기다리는 연인 권영진 님을 위해 "두바이에서 사 올 선물" 하나를 골라 준다.',
+  '매번 새 추천이어야 한다. [참고 데이터]의 이미추천·위시리스트에 있는 품목은 이름이 비슷해도 다시 추천하지 않는다.',
+  '',
+  '[추천 기준]',
+  '1. 두바이(UAE)에서 실제로 살 수 있고, 한국에서 구하기 어렵거나 두바이에서 더 싼 것. 관광객이 진짜 사 가는 것.',
+  '2. 가격대 5~400 AED. 구매처는 몰·수크·면세점·슈퍼마켓(Spinneys·Carrefour·Union Coop) 등 실제 이름으로 구체적으로.',
+  '3. 카테고리는 정확히 이 넷 중 하나: "초콜릿·디저트", "향수·뷰티", "면세점", "기념품·기타".',
+  '4. 뻔한 기념품만 반복하지 말고 사막·금·향신료·장미수·대추야자·우드향 같은 아랍맨 취향을 섞어 다채롭게.',
+  '5. 종교·문화적으로 무례한 품목, 한국 반입이 막히는 것(육류·유제품 가공품 등)은 피한다.',
+  '',
+  '[출력 형식]',
+  '설명·인사·마크다운·코드펜스 없이 아래 JSON 객체 하나만 출력한다.',
+  '{"item":"품목명(한국어, 괄호 안 현지명 가능)","price_aed":숫자,"where":"구매처","category":"위 4개 중 하나","tip":"아랍맨의 반말 한 줄 팁 (35자 이내)"}'
+].join('\n');
+
+const GIFT_CATS = ['초콜릿·디저트', '향수·뷰티', '면세점', '기념품·기타'];
+
+function parseLooseJson(t: string): any | null {
+  const s = String(t || '').trim().replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
+  const i = s.indexOf('{');
+  const j = s.lastIndexOf('}');
+  if (i < 0 || j <= i) return null;
+  try {
+    return JSON.parse(s.slice(i, j + 1));
+  } catch {
+    return null;
+  }
+}
+
+function normalizeTip(raw: any) {
+  if (!raw || typeof raw !== 'object') return null;
+  const item = clip(raw.item ?? raw.name ?? '', 80).trim();
+  if (!item) return null;
+  const price = Number(String(raw.price_aed ?? raw.price ?? '').replace(/[^\d.]/g, ''));
+  const catRaw = String(raw.category || '').trim();
+  const where = clip(raw.where ?? raw.place ?? raw.store ?? '', 120).trim();
+  const tip = clip(raw.tip ?? raw.comment ?? '', 120).trim();
+  return {
+    item,
+    price_aed: Number.isFinite(price) && price > 0 ? Math.round(price * 100) / 100 : null,
+    where,
+    category: GIFT_CATS.includes(catRaw) ? catRaw : '기념품·기타',
+    tip
+  };
+}
+
+async function handleGiftTip(payload: any, key: string) {
+  const seen = Array.isArray(payload?.seen) ? payload.seen.slice(-14).map((x: any) => clip(x, 60)) : [];
+  const wish = Array.isArray(payload?.wishlist) ? payload.wishlist.slice(-20).map((x: any) => clip(x, 60)) : [];
+  const ctx = {
+    시기: '2026년 12월 겨울, 두바이',
+    출장자: '고건우 (12/6~12/12 두바이 체류, 인천 12/5 23:40 출발)',
+    선물받는사람: '연인 권영진',
+    이미추천: seen,
+    위시리스트: wish
+  };
+  const systemPrompt = GIFT_SYSTEM_PROMPT + '\n\n[참고 데이터]\n' + clip(JSON.stringify(ctx), 4000);
+  const t0 = Date.now();
+  const out = await runText(
+    key,
+    systemPrompt,
+    [{ role: 'user', parts: [{ text: '두바이 선물 하나만 새로 추천해줘. JSON만.' }] }],
+    { temperature: 1.05, maxTokens: 400 }
+  );
+  if (!out.ok) return json({ ok: false, error: out.error, detail: out.detail, tried: out.tried }, 502);
+  const tip = normalizeTip(parseLooseJson(out.reply));
+  if (!tip) return json({ ok: false, error: 'bad_tip_json', detail: clip(out.reply, 240) }, 502);
+  return json({ ok: true, mode: 'gift_tip', tip, model: out.model, ms: Date.now() - t0 });
+}
 
 function toGeminiContents(messages: Msg[]) {
   const list = (Array.isArray(messages) ? messages : [])
@@ -431,8 +503,8 @@ Deno.serve(async (req: Request) => {
   if (req.method === 'GET') {
     return json({
       ok: true, fn: 'dubai-ai', model: PRIMARY_MODEL,
-      modes: ['chat', 'translate', 'tts'], tts: { models: TTS_MODELS, voice: TTS_VOICE, fallback: 'google-translate-tts' },
-      hint: 'POST {messages, context} | {mode:"translate",messages} | {mode:"tts",text}'
+      modes: ['chat', 'translate', 'tts', 'gift_tip'], tts: { models: TTS_MODELS, voice: TTS_VOICE, fallback: 'google-translate-tts' },
+      hint: 'POST {messages, context} | {mode:"translate",messages} | {mode:"tts",text} | {mode:"gift_tip",seen,wishlist}'
     });
   }
   if (req.method !== 'POST') return json({ ok: false, error: 'method_not_allowed' }, 405);
@@ -451,6 +523,8 @@ Deno.serve(async (req: Request) => {
   if (mode === 'tts') return handleTts(payload, key);
 
   if (!key) return json({ ok: false, error: 'missing_gemini_api_key' }, 500);
+
+  if (mode === 'gift_tip') return handleGiftTip(payload, key);
 
   const contents = toGeminiContents(payload.messages);
   if (!contents.length) return json({ ok: false, error: 'no_messages' }, 400);
