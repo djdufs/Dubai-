@@ -897,7 +897,8 @@ function tickDday(now){
   let phase='출국까지', target=DEP, num, cap, from, to;
   if(now<DEP){
     const left=DEP-now;
-    const days=Math.ceil(left/86400000);
+    const kd=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'});
+    const days=Math.round((Date.parse(kd.format(DEP))-Date.parse(kd.format(now)))/86400000);
     num='D-'+(days<=0?'DAY':days);
     cap='12월 5일(토) 23:40 · 인천 T1 출발';
     const total=DEP-new Date('2026-11-25T00:00:00+09:00');
@@ -1196,7 +1197,8 @@ async function geocode(q){
 async function savePlace(){
   const name=$('#psName').value.trim();
   if(!name){ toast('장소명을 넣어 주세요'); $('#psName').focus(); return; }
-  const cat=($$('#psCat button').find(b=>b.classList.contains('on'))||{}).dataset?.cat||'관광';
+  const catBtn=$$('#psCat button').find(b=>b.classList.contains('on'));
+  const cat=(catBtn&&catBtn.dataset.cat)||'관광';
   const row={
     category:cat, name:name,
     address:$('#psAddr').value.trim()||null,
