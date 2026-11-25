@@ -1334,7 +1334,7 @@ function paintWho(){
   $('#whoTxt').textContent=who.name||'누구세요?';
 }
 function askWho(cb){
-  if(who.name){ if(cb) cb(); return true; }
+  if(who.name) return true;
   who._pending=cb||null;
   $('#whoSheet').hidden=false;
   return false;
@@ -1408,7 +1408,7 @@ function renderAlbum(){
   $('#albumEmpty').hidden=!!pics.length;
   $('#albumGrid').innerHTML=pics.slice().reverse().map(n=>'<button data-lb="'+esc(n.image_url)+'"><img src="'+esc(n.image_url)+'" alt="사진" loading="lazy"></button>').join('');
 }
-let sending=false;
+let sending=false, lastSent={sig:'',at:0};
 async function sendNote(){
   if(sending) return;
   if(!askWho(sendNote)) return;
@@ -1416,6 +1416,9 @@ async function sendNote(){
   const body=input.value.trim();
   const file=($('#chatFile').files||[])[0]||null;
   if(!body && !file){ toast('메시지나 사진을 넣어 주세요'); input.focus(); return; }
+  const sig=(who.name||'')+'|'+body+'|'+(file?file.name+file.size:'');
+  if(sig===lastSent.sig && Date.now()-lastSent.at<4000){ return; }
+  lastSent={sig:sig,at:Date.now()};
   sending=true;
   const btn=$('#chatSend'); btn.disabled=true; btn.textContent='…';
   try{
@@ -1559,7 +1562,7 @@ function bind(){
 
   $('#chatSend').onclick=sendNote;
   $('#chatInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); sendNote(); } });
-  $('#chatPhoto').onclick=()=>{ if(!askWho()) return; $('#chatFile').click(); };
+  $('#chatPhoto').onclick=()=>{ if(!askWho(()=>{ $('#chatFile').click(); })) return; $('#chatFile').click(); };
   $('#chatFile').addEventListener('change',()=>{ if($('#chatFile').files.length) toast('사진을 골랐어요 — 전송을 눌러 주세요'); });
 }
 
