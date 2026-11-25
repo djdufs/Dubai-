@@ -1,5 +1,5 @@
 /* 두바이 출장 가이드 — service worker (shell only) */
-const CACHE = 'dubai-shell-v2';
+const CACHE = 'dubai-shell-v3';
 const SHELL = ['./', './index.html', './manifest.json', './icons/icon-192.png', './icons/icon-512.png',
   './assets/audio/phrase-01.mp3', './assets/audio/phrase-02.mp3', './assets/audio/phrase-03.mp3',
   './assets/audio/phrase-04.mp3', './assets/audio/phrase-05.mp3', './assets/audio/phrase-06.mp3',

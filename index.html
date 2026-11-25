@@ -1549,7 +1549,17 @@ function setPlaying(i){
 }
 function stopPhrase(){
   if(AUD){ try{ AUD.pause(); AUD.currentTime=0; }catch(e){} }
+  if(ttsEl && ttsEl.dataset.phr!=null){ ttsStopAll(); delete ttsEl.dataset.phr; }
   setPlaying(-1);
+}
+/* 박제 MP3가 실패하면(파일 손상·iOS 캐시) 서버 TTS로 이어서 재생 */
+let phraseFailAt=0;
+function phraseFail(i){
+  const now=Date.now();
+  if(now-phraseFailAt<1200) return;
+  phraseFailAt=now;
+  setPlaying(-1);
+  playPhraseServer(i);
 }
 function playPhrase(i){
   const p=PHRASES[i]; if(!p) return;
@@ -1557,13 +1567,111 @@ function playPhrase(i){
   if(!AUD){
     AUD=new Audio(); AUD.preload='auto';
     AUD.addEventListener('ended',()=>setPlaying(-1));
-    AUD.addEventListener('error',()=>{ const cur=playingIdx; setPlaying(-1); if(cur>=0) speakAr(PHRASES[cur].ar,'mp3'); });
+    AUD.addEventListener('error',()=>{ const cur=playingIdx; if(cur>=0) phraseFail(cur); });
   }
+  ttsStopAll(); if(ttsEl) delete ttsEl.dataset.tr;
   try{ AUD.pause(); }catch(e){}
   AUD.src=audioSrc(i);
   setPlaying(i);
   const pr=AUD.play();
-  if(pr&&typeof pr.catch==='function') pr.catch(()=>{ setPlaying(-1); speakAr(p.ar,'mp3'); });
+  if(pr&&typeof pr.catch==='function') pr.catch(()=>phraseFail(i));
+}
+async function playPhraseServer(i){
+  const p=PHRASES[i]; if(!p) return;
+  const el=ttsAudio();
+  ttsStopAll();
+  setPlaying(i); el.dataset.phr=String(i); delete el.dataset.tr;
+  try{
+    const url=await ttsUrl(p.ar);
+    if(el.dataset.phr!==String(i)) return;
+    el.src=url; await el.play();
+  }catch(e){
+    delete el.dataset.phr; setPlaying(-1); speakAr(p.ar);
+  }
+}
+
+/* ================= 서버 TTS (기기 아랍어 음성팩 없이 재생) ================= */
+const TTS_CACHE=new Map(), TTS_CACHE_MAX=12;
+let ttsEl=null, say={seq:0,text:'',busy:false};
+function ttsBytes(b64){
+  const bin=atob(b64); const u=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i);
+  return u;
+}
+function ttsAudio(){
+  if(ttsEl) return ttsEl;
+  ttsEl=new Audio(); ttsEl.preload='auto'; ttsEl.setAttribute('playsinline','');
+  ttsEl.addEventListener('ended',()=>{
+    if(ttsEl.dataset.tr){ delete ttsEl.dataset.tr; say.text=''; sayBtn('idle'); }
+    if(ttsEl.dataset.phr!=null){ delete ttsEl.dataset.phr; setPlaying(-1); }
+  });
+  ttsEl.addEventListener('error',()=>{
+    if(ttsEl.dataset.tr){ delete ttsEl.dataset.tr; say.text=''; sayBtn('idle'); toast('음성을 재생하지 못했어요 — 🔊 듣기를 다시 눌러 주세요'); }
+    if(ttsEl.dataset.phr!=null){ delete ttsEl.dataset.phr; setPlaying(-1); }
+  });
+  return ttsEl;
+}
+function ttsStopAll(){ if(ttsEl){ try{ ttsEl.pause(); }catch(e){} } }
+/* iOS는 제스처 밖에서 시작한 play()를 막는다 — 첫 터치에서 무음 파일로 오디오 요소를 미리 열어 둔다 */
+let ttsUnlocked=false;
+function unlockTts(){
+  if(ttsUnlocked) return;
+  ttsUnlocked=true;
+  try{
+    const el=ttsAudio();
+    el.src='assets/audio/silent.wav';
+    const p=el.play();
+    if(p&&typeof p.catch==='function') p.catch(()=>{});
+  }catch(e){}
+}
+async function ttsUrl(text){
+  if(TTS_CACHE.has(text)) return TTS_CACHE.get(text);
+  const r=await fetch(AI_URL,{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({mode:'tts',text:text})
+  });
+  const d=await r.json().catch(()=>null);
+  if(!r.ok || !d || !d.ok || !d.audio){
+    const msg=(d&&(d.detail||d.error))?String(d.detail||d.error):('HTTP '+r.status);
+    throw new Error(msg.slice(0,160));
+  }
+  const url=URL.createObjectURL(new Blob([ttsBytes(d.audio)],{type:d.mime||'audio/wav'}));
+  if(TTS_CACHE.size>=TTS_CACHE_MAX){
+    const k=TTS_CACHE.keys().next().value;
+    try{ URL.revokeObjectURL(TTS_CACHE.get(k)); }catch(e){}
+    TTS_CACHE.delete(k);
+  }
+  TTS_CACHE.set(text,url);
+  return url;
+}
+function sayBtn(state){
+  const b=document.querySelector('#trOut [data-trsay]'); if(!b) return;
+  b.disabled=(state==='load');
+  b.classList.toggle('on',state==='play');
+  b.textContent = state==='load' ? '⏳ 준비 중…' : (state==='play' ? '⏸ 멈추기' : '🔊 듣기');
+}
+async function trSay(){
+  const o=tr.last; if(!o||!o.arabic){ toast('번역 결과가 없어요'); return; }
+  const el=ttsAudio();
+  if(!el.paused && say.text===o.arabic){ ttsStopAll(); say.text=''; sayBtn('idle'); return; }
+  const token=++say.seq;
+  say.text=o.arabic; say.busy=true;
+  ttsStopAll(); stopPhrase();
+  sayBtn('load');
+  try{
+    const url=await ttsUrl(o.arabic);
+    if(token!==say.seq) return;
+    el.dataset.tr='1'; delete el.dataset.phr;
+    el.src=url;
+    await el.play();
+    sayBtn('play');
+  }catch(e){
+    if(token!==say.seq) return;
+    say.text=''; sayBtn('idle');
+    toast('음성을 불러오지 못했어요 — 잠시 뒤 🔊 듣기를 다시 눌러 주세요');
+  }finally{
+    if(token===say.seq) say.busy=false;
+  }
 }
 
 /* ---- 발음 재생 ---- */
@@ -1582,11 +1690,12 @@ function warmVoices(){
   try{ window.speechSynthesis.addEventListener('voiceschanged',()=>{ AR_VOICE=pickArVoice(); }); }catch(e){}
 }
 function speakAr(text, src){
-  if(!('speechSynthesis' in window)||!text){ toast('이 브라우저는 음성 재생을 지원하지 않아요'); return; }
+  // 마지막 수단: 서버 TTS까지 실패했을 때만 쓰는 기기 음성
+  if(!('speechSynthesis' in window)||!text){ toast('음성을 재생하지 못했어요 — 잠시 뒤 다시 눌러 주세요'); return; }
   const v=AR_VOICE||pickArVoice();
   if(!v){
-    if(!AR_VOICES_READY){ setTimeout(()=>{ AR_VOICE=pickArVoice(); if(!AR_VOICE) toast('이 기기에 아랍어 음성이 없어요 — 설정에서 아랍어 음성팩을 받으면 들을 수 있어요'); },350); toast('아랍어 음성을 준비하고 있어요…'); return; }
-    toast('이 기기에 아랍어 음성이 없어요 — 설정에서 아랍어 음성팩을 받으면 들을 수 있어요'); return;
+    if(!AR_VOICES_READY){ setTimeout(()=>{ AR_VOICE=pickArVoice(); if(!AR_VOICE) toast('음성을 재생하지 못했어요 — 잠시 뒤 다시 눌러 주세요'); },350); return; }
+    toast('음성을 재생하지 못했어요 — 잠시 뒤 다시 눌러 주세요'); return;
   }
   try{
     window.speechSynthesis.cancel();
@@ -1595,6 +1704,10 @@ function speakAr(text, src){
     window.speechSynthesis.speak(u);
   }catch(e){ toast('발음을 재생하지 못했어요'); }
 }
+
+document.addEventListener('pointerdown',unlockTts,{passive:true});
+document.addEventListener('touchstart',unlockTts,{passive:true});
+document.addEventListener('click',unlockTts,{passive:true});
 
 /* ================= 실시간 번역기 ================= */
 const tr={busy:false, last:null, q:''};
@@ -1684,7 +1797,7 @@ function bindTranslator(){
   inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); inp.blur(); trGo(inp.value); } });
   $$('#trChips button').forEach(b=>{ b.onclick=()=>{ inp.value=b.dataset.tr; trGo(b.dataset.tr); }; });
   out.addEventListener('click',e=>{
-    if(e.target.closest('[data-trsay]')){ if(tr.last) speakAr(tr.last.arabic); return; }
+    if(e.target.closest('[data-trsay]')){ trSay(); return; }
     if(e.target.closest('[data-trcopy]')){ if(tr.last) copyText(tr.last.arabic); return; }
     if(e.target.closest('[data-trretry]')){ trGo(tr.q||inp.value,true); return; }
   });
