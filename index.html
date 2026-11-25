@@ -208,8 +208,8 @@ main{max-width:620px; margin:0 auto; padding:12px 12px 0}
 .ck-row:last-child{border-bottom:0}
 .ck-box{flex:0 0 auto; width:19px; height:19px; border-radius:6px; border:1.6px solid var(--line2); display:flex; align-items:center; justify-content:center; font-size:11px; color:transparent; background:rgba(255,255,255,.03)}
 .ck-row.on .ck-box{background:var(--green); border-color:var(--green); color:#06251a}
-.ck-row .lb{flex:1 1 auto; font-size:13px; letter-spacing:-.2px}
-.ck-row.on .lb{color:var(--ink3); text-decoration:line-through}
+.ck-row .ckl{flex:1 1 auto; font-size:13px; letter-spacing:-.2px; min-width:0}
+.ck-row.on .ckl{color:var(--ink3); text-decoration:line-through}
 .ck-row .x{font-size:12px; color:var(--ink3); padding:2px 4px}
 .ck-add{display:flex; gap:7px; margin-top:9px}
 .ck-add input{flex:1 1 auto; height:38px; border-radius:10px; border:1px solid var(--line2); background:rgba(255,255,255,.04); padding:0 11px; font-size:13px}
@@ -1290,7 +1290,7 @@ function renderChecklist(){
   $('#ckCnt').textContent=done+'/'+list.length;
   $('#ckBar').style.width=(list.length?(done/list.length*100):0)+'%';
   $('#ckList').innerHTML=list.map(x=>'<div class="ck-row '+(x.done?'on':'')+'" data-ck="'+esc(x.id)+'">'
-    +'<div class="ck-box">✓</div><div class="lb">'+esc(x.label)+'</div><button class="x" data-ckdel="'+esc(x.id)+'">✕</button></div>').join('');
+    +'<div class="ck-box">✓</div><div class="ckl">'+esc(x.label)+'</div><button class="x" data-ckdel="'+esc(x.id)+'">✕</button></div>').join('');
 }
 async function toggleCk(id){
   const it=DB.ck.find(x=>String(x.id)===String(id)); if(!it) return;
