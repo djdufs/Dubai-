@@ -15,6 +15,7 @@
 <meta name="description" content="2026년 12월 5일~12일 고건우 두바이 출장 — 듀얼 시계, 항공편, 숙소·출장지 등록, 지도·길찾기, 날씨, 환율, 커플 톡·사진첩">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%87%A6%F0%9F%87%AA%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 <style>
 :root{
   --bg:#070e18; --bg2:#0a1421; --card:#0f1b2c; --card2:#14233a; --card3:#182a44;
@@ -90,9 +91,9 @@ main{max-width:620px; margin:0 auto; padding:12px 12px 0}
   flex:1 1 0; max-width:118px; display:flex; flex-direction:column; align-items:center; gap:3px;
   padding:5px 2px; border-radius:12px; color:var(--ink3); font-size:10.5px; font-weight:700; letter-spacing:-.1px;
 }
-.nav button .ic{font-size:18px; line-height:1; filter:grayscale(.55) opacity(.8)}
+.nav button .ic{font-size:18px; line-height:1; opacity:.62; transition:opacity .15s}
 .nav button.on{color:var(--gold); background:var(--goldbg)}
-.nav button.on .ic{filter:none}
+.nav button.on .ic{opacity:1}
 .nav button .badge{position:absolute; transform:translate(14px,-4px); background:var(--red); color:#1a0b08; font-size:9px; font-weight:900; border-radius:999px; padding:0 4px; line-height:14px; min-width:14px; text-align:center}
 
 /* ---------- generic ---------- */
@@ -1247,6 +1248,7 @@ async function deletePlace(id){
 const mapState={map:null, layer:null, ready:false};
 function initMap(){
   if(mapState.map) return;
+  if(typeof L==='undefined'){ $('#map').innerHTML='<div class="empty" style="padding:40px 16px"><div class="big">🗺️</div>지도 라이브러리를 불러오지 못했어요.<br>인터넷 연결을 확인하고 새로고침해 주세요.</div>'; return; }
   const m=L.map('map',{zoomControl:true, scrollWheelZoom:false, attributionControl:true});
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
     maxZoom:19, subdomains:'abcd',
