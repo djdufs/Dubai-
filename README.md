@@ -22,8 +22,9 @@
 7. **아랍맨 AI 상담** — 우측 하단 아바타 FAB("도와줘요 아랍맨! 🐫") → 바텀시트 대화. Gemini Edge Function `dubai-ai`가 사이트의 실시간 데이터(항공편·등록 장소·날씨·환율·준비물·톡)를 컨텍스트로 받아 한국어 반말로 답한다. 빠른 질문 칩 4종.
 8. **커플 톡·사진첩** — 접속자 선택(건우/영진, sessionStorage), 메모·사진(1400px JPEG 0.82 압축 후 Storage 업로드)
 9. **출장 준비물 체크리스트** — 공유 체크 상태
-10. **아랍어 생존 문구 10종 — `🔊` 발음 듣기** (생존 탭) — 고정 문구마다 아랍어 원문·로마자 발음·복사·`🔊` 버튼. 음성은 레포에 박제된 MP3(`assets/audio/phrase-01.mp3`~`phrase-10.mp3`, `ar-AE-HamdanNeural`)를 재생하고, 로드 실패 시에만 `speechSynthesis`로 조용히 폴백한다.
-11. **실시간 번역기** (생존 탭 하단) — 한국어/영어 입력 → 아랍어 원문(로마자 발음)·영어 표현·현지 한 줄 팁. `dubai-ai` 함수에 `mode:'translate'` + JSON 출력 지시 프롬프트를 보내 프론트에서 파싱한다(서버 변경 없음). 결과는 `🔊 듣기`(`speechSynthesis` `ar-AE`/`ar-SA`, 없으면 안내 토스트) · `복사` · `다시`, 같은 문장은 `localStorage`에 캐시.
+10. **아랍어 생존 문구 10종 — `🔊` 발음 듣기** (생존 탭) — 고정 문구마다 아랍어 원문·로마자 발음·복사·`🔊` 버튼. 음성은 레포에 박제된 MP3(`assets/audio/phrase-01.mp3`~`phrase-10.mp3`, `ar-AE-HamdanNeural`)를 재생하고, MP3 로드가 실패하면 서버 TTS로 이어서 재생한다(마지막에만 `speechSynthesis`).
+11. **실시간 번역기** (생존 탭 하단) — 한국어/영어 입력 → 아랍어 원문(로마자 발음)·영어 표현·현지 한 줄 팁. `dubai-ai` 함수에 `mode:'translate'`로 보내고 프론트 `parseTrJSON()`이 파싱한다. 결과는 `🔊 듣기` · `복사` · `다시`, 같은 문장은 `localStorage`에 캐시.
+    - `🔊 듣기`는 **서버 TTS**(`mode:'tts'`)로 받은 아랍어 오디오를 재생한다 — 기기에 아랍어 음성팩이 없어도 소리가 난다. 버튼은 `⏳ 준비 중…` → `⏸ 멈추기`로 바뀌고, 받은 오디오는 문장별 메모리 캐시(최대 12개 blob URL)라 다시 누르면 즉시 재생된다. 실패했을 때만 "다시 눌러 주세요" 토스트가 뜬다.
 
 ## Supabase
 - Project ref와 키는 `index.html` 상단 `SUPA`, `SUPA_KEY` 상수에 있다. **Publishable 키만** 프론트에 쓰고 Secret Key는 절대 넣지 않는다.
@@ -35,12 +36,17 @@
 ## Edge Function `dubai-ai`
 - `supabase/functions/dubai-ai/index.ts` (Deno, `verify_jwt: false`, CORS `*`)
 - `GEMINI_API_KEY`는 Supabase 프로젝트 Secrets에만 등록한다(코드·저장소 금지).
-- 모델: `gemini-3.1-flash-lite` 1순위 → `gemini-3.5-flash` 폴백. 입력 `{messages, context}`.
-- 번역기는 같은 함수를 그대로 쓴다. 서버는 `mode` 필드를 무시하므로, 요청 본문에 `mode:'translate'`와 JSON만 출력하라는 지시 프롬프트를 넣고 프론트 `parseTrJSON()`이 `{arabic, pronunciation, english, tip}`을 파싱한다(코드펜스·앞뒤 잡설은 잘라냄). 응답은 보통 1초 내, 모델 폴백 시 수 초~수십 초 걸릴 수 있어 25초 타임아웃 + `다시 시도` 버튼을 둔다.
+- `mode` 세 갈래: 없음/`chat`(아랍맨 상담, 입력 `{messages, context}`), `translate`(번역기, JSON 한 개), `tts`(아랍어 오디오, 입력 `{text, lang?, voice?}`).
+- 모델: `gemini-3.1-flash-lite` 1순위 → `gemini-3.6-flash` → `gemini-3.5-flash` → `gemini-2.5-flash-lite` → `gemini-2.5-flash`. 1순위가 3.5초 안에 답하지 않으면 다음 모델을 **함께 출발**시키고(먼저 성공한 응답 채택), 한 번 시도는 12초에서 끊는다 — 특정 모델이 503(과부하)일 때 전체가 붙잡히지 않게.
+- `mode:'translate'`는 전용 시스템 프롬프트(걸프 방언 톤, temperature 0.2)로 JSON만 돌려준다.
+- `mode:'tts'` 응답: `{ok, engine, mime, bytes, ms, audio(base64)}` (+ 캐시 hit이면 `cached:true`). 실측 2~3초, 3초 분량 WAV ≈ 180KB(base64 240KB). 같은 텍스트는 함수 인스턴스 메모리에 캐시(≤6MB).
+- 번역기는 같은 함수를 그대로 쓴다. 서버는 `mode` 필드를 무시하므로, 요청 본문에 `mode:'translate'`와 JSON만 출력하라는 지시 프롬프트를 넣고 프론트 `parseTrJSON()`이 `{arabic, pronunciation, english, tip}`을 파싱한다(코드펜스·앞뒤 잡설은 잘라냄). 응답은 보통 1~2초, 모델 폴백 시 수 초 걸릴 수 있어 25초 타임아웃 + `다시 시도` 버튼을 둔다.
 
 ## 오디오(`assets/audio/`)
 - 10개 생존 문구의 아랍어 발음 MP3. 생성: `pip install edge-tts` → `edge-tts`의 `ar-AE-HamdanNeural`(rate `-8%`), 24kHz 모노.
-- `sw.js` 셸 캐시(`dubai-shell-v2`)에 포함되어 오프라인에서도 재생된다. 문구를 바꿀 때는 `index.html`의 `PHRASES`와 MP3를 같이 갱신한다.
+- `sw.js` 셸 캐시(`dubai-shell-v3`)에 포함되어 오프라인에서도 재생된다. 문구를 바꿀 때는 `index.html`의 `PHRASES`와 MP3를 같이 갱신한다.
+- `silent.wav` — iOS가 제스처 밖 `play()`를 막는 문제를 피하려고 첫 터치에서 이 무음 파일로 오디오 요소를 미리 열어 두는 용도(50ms).
+- 번역기·MP3 실패 폴백 음성은 서버에서 만든다: **Gemini TTS `gemini-3.8-flash-tts`**(voice `Sadaltager`, `audio/wav` 반환) 1순위 → `gemini-3.8-flash-lite-tts` / `gemini-3.1-flash-tts-preview` / `gemini-2.5-flash-preview-tts`(PCM 24kHz에 WAV 헤더 부착) → 최종 폴백 구글 번역 음성(`translate_tts`, MP3). TTS 모델·보이스는 `GEMINI_TTS_MODEL`·`GEMINI_TTS_VOICE` Secret으로 바꿀 수 있다.
 
 ## 스크린샷
 | 파일 | 내용 |
@@ -53,6 +59,7 @@
 | `screenshots/06-커플톡-사진.png` | 커플 톡·사진 |
 | `screenshots/07-아랍어-생존문구-발음듣기-MP3.png` | 생존 문구 10개 + 🔊 재생 중(첫 행 하이라이트) |
 | `screenshots/08-실시간-번역기-결과.png` | 실시간 번역기 — 실제 번역 결과(아랍어·로마자·영어·팁) |
+| `screenshots/09-실시간-번역기-서버TTS-듣기-재생중.png` | `🔊 듣기` → 서버 TTS 재생 중(`⏸ 멈추기`) |
 
 ## 수정·배포
 ```bash
