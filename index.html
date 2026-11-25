@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080f1a">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="두바이">
+<meta name="application-name" content="두바이 출장">
+<title>두바이 출장 가이드 · 건우 12.5–12.12</title>
+<meta name="description" content="2026년 12월 5일~12일 고건우 두바이 출장 — 듀얼 시계, 항공편, 숙소·출장지 등록, 지도·길찾기, 날씨, 환율, 커플 톡·사진첩">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%87%A6%F0%9F%87%AA%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{
+  --bg:#070e18; --bg2:#0a1421; --card:#0f1b2c; --card2:#14233a; --card3:#182a44;
+  --line:#1d2f49; --line2:#243a58;
+  --ink:#eef4fb; --ink2:#a7b9cd; --ink3:#6d8299;
+  --gold:#e3b464; --gold2:#c79340; --goldbg:rgba(227,180,100,.13); --goldline:rgba(227,180,100,.34);
+  --blue:#5fa8ff; --bluebg:rgba(95,168,255,.13);
+  --green:#5fd39a; --greenbg:rgba(95,211,154,.13);
+  --orange:#ffa26b; --orangebg:rgba(255,162,107,.13);
+  --red:#ff7a6b; --redbg:rgba(255,122,107,.13);
+  --r:16px; --r2:12px;
+  --sh:0 2px 4px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.25);
+  --hdr:132px; --nav:64px;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:
+    radial-gradient(1100px 500px at 78% -8%, rgba(227,180,100,.11), transparent 62%),
+    radial-gradient(800px 420px at 10% 4%, rgba(95,168,255,.08), transparent 60%),
+    var(--bg);
+  color:var(--ink); min-height:100vh;
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR","Segoe UI",Roboto,sans-serif;
+  font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  padding-bottom:calc(var(--nav) + env(safe-area-inset-bottom) + 10px);
+}
+[hidden]{display:none !important}
+button{font:inherit; color:inherit; border:0; background:none; cursor:pointer; padding:0}
+a{color:inherit; text-decoration:none}
+input,textarea,select{font:inherit; color:var(--ink)}
+main{max-width:620px; margin:0 auto; padding:12px 12px 0}
+
+/* ---------- header ---------- */
+.hdr{
+  position:sticky; top:0; z-index:60;
+  background:linear-gradient(180deg, rgba(9,17,28,.97), rgba(9,17,28,.92));
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(227,180,100,.16);
+  padding:calc(7px + env(safe-area-inset-top)) 12px 9px;
+}
+.hdr-in{max-width:596px; margin:0 auto}
+.hrow{display:flex; align-items:center; justify-content:space-between; gap:8px; height:26px}
+.brand{display:flex; align-items:center; gap:8px; min-width:0}
+.brand .flag{font-size:18px; line-height:1}
+.brand b{font-size:14px; letter-spacing:1.6px; color:var(--gold); font-weight:800}
+.brand span.sub{font-size:11.5px; color:var(--ink3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.who{
+  display:flex; align-items:center; gap:5px; flex:0 0 auto;
+  font-size:11.5px; font-weight:700; color:var(--gold);
+  background:var(--goldbg); border:1px solid var(--goldline);
+  padding:4px 9px; border-radius:999px; max-width:132px;
+}
+.who span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.clocks{display:flex; align-items:center; gap:8px; margin-top:7px}
+.clk{flex:1 1 0; min-width:0; background:rgba(255,255,255,.035); border:1px solid var(--line); border-radius:12px; padding:6px 9px}
+.clk.gst{background:var(--goldbg); border-color:var(--goldline)}
+.clk .lbl{display:flex; align-items:baseline; gap:5px; font-size:10px; color:var(--ink3); letter-spacing:.4px; text-transform:uppercase; font-weight:700}
+.clk.gst .lbl{color:var(--gold2)}
+.clk .lbl em{font-style:normal; font-size:9px; opacity:.85}
+.clk b{display:block; font-size:20px; font-weight:800; letter-spacing:-.4px; font-variant-numeric:tabular-nums; line-height:1.15; margin-top:1px}
+.clk .dt{font-size:10.5px; color:var(--ink3); font-variant-numeric:tabular-nums}
+.clk.gst .dt{color:var(--gold2)}
+.diff{flex:0 0 auto; font-size:9.5px; font-weight:800; color:var(--ink3); background:rgba(255,255,255,.05); border:1px solid var(--line); border-radius:8px; padding:3px 5px; letter-spacing:-.2px}
+
+/* ---------- bottom nav ---------- */
+.nav{
+  position:fixed; left:0; right:0; bottom:0; z-index:70;
+  display:flex; justify-content:center; gap:2px;
+  background:rgba(8,15,25,.96); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+  border-top:1px solid var(--line); padding:6px 6px calc(6px + env(safe-area-inset-bottom));
+}
+.nav button{
+  flex:1 1 0; max-width:118px; display:flex; flex-direction:column; align-items:center; gap:3px;
+  padding:5px 2px; border-radius:12px; color:var(--ink3); font-size:10.5px; font-weight:700; letter-spacing:-.1px;
+}
+.nav button .ic{font-size:18px; line-height:1; filter:grayscale(.55) opacity(.8)}
+.nav button.on{color:var(--gold); background:var(--goldbg)}
+.nav button.on .ic{filter:none}
+.nav button .badge{position:absolute; transform:translate(14px,-4px); background:var(--red); color:#1a0b08; font-size:9px; font-weight:900; border-radius:999px; padding:0 4px; line-height:14px; min-width:14px; text-align:center}
+
+/* ---------- generic ---------- */
+.page{display:block; animation:fade .22s ease}
+@keyframes fade{from{opacity:.4; transform:translateY(3px)} to{opacity:1; transform:none}}
+.card{
+  background:linear-gradient(180deg, var(--card), var(--bg2));
+  border:1px solid var(--line); border-radius:var(--r);
+  padding:14px; margin-bottom:12px; box-shadow:var(--sh);
+}
+.card.tight{padding:12px}
+.ph{display:flex; align-items:center; gap:8px; margin:2px 2px 10px}
+.ph h2{margin:0; font-size:16px; font-weight:800; letter-spacing:-.3px}
+.ph .cnt{font-size:11.5px; color:var(--ink3); font-weight:700}
+.ph .sp{flex:1 1 auto}
+.muted{color:var(--ink2); font-size:12.5px}
+.dim{color:var(--ink3)}
+.pill{
+  display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:800;
+  padding:3px 9px; border-radius:999px; background:var(--goldbg); color:var(--gold); border:1px solid var(--goldline);
+}
+.pill.blue{background:var(--bluebg); color:var(--blue); border-color:rgba(95,168,255,.32)}
+.pill.green{background:var(--greenbg); color:var(--green); border-color:rgba(95,211,154,.32)}
+.pill.red{background:var(--redbg); color:var(--red); border-color:rgba(255,122,107,.32)}
+.pill.gray{background:rgba(255,255,255,.06); color:var(--ink2); border-color:var(--line)}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  height:42px; padding:0 16px; border-radius:12px; font-size:13.5px; font-weight:800;
+  background:var(--card3); color:var(--ink); border:1px solid var(--line2);
+}
+.btn.primary{background:linear-gradient(180deg,#f0c675,#d7a24d); color:#2a1c06; border-color:#e9bc6c; box-shadow:0 6px 18px rgba(227,180,100,.24)}
+.btn.ghost{background:rgba(255,255,255,.04)}
+.btn.danger{background:var(--redbg); color:var(--red); border-color:rgba(255,122,107,.32)}
+.btn.sm{height:34px; padding:0 11px; font-size:12px; border-radius:10px}
+.btn.block{display:flex; width:100%}
+.mini{
+  font-size:12px; font-weight:800; color:var(--gold); background:var(--goldbg);
+  border:1px solid var(--goldline); border-radius:999px; padding:5px 11px;
+}
+.mini.gray{color:var(--ink2); background:rgba(255,255,255,.05); border-color:var(--line2)}
+.banner{
+  margin:0 0 12px; padding:10px 12px; border-radius:12px; font-size:12px; line-height:1.45;
+  background:var(--orangebg); border:1px solid rgba(255,162,107,.3); color:#ffccae;
+}
+.banner b{color:#ffd9c2}
+
+/* ---------- hero ---------- */
+.hero{position:relative; overflow:hidden; padding:16px 16px 14px; background:linear-gradient(160deg,#12233a,#0b1523 62%)}
+.hero:before{content:""; position:absolute; inset:-40% -20% auto auto; width:280px; height:280px; border-radius:50%;
+  background:radial-gradient(circle, rgba(227,180,100,.22), transparent 66%); pointer-events:none}
+.hero-top{display:flex; align-items:center; justify-content:space-between; gap:8px; position:relative}
+.dday{margin-top:8px; display:flex; align-items:flex-end; gap:8px; position:relative}
+.dday .num{
+  font-size:50px; font-weight:900; letter-spacing:-2.5px; line-height:.95;
+  background:linear-gradient(180deg,#ffe0a6,#ddaa52 62%,#b8852f);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.dday .cap{font-size:12px; color:var(--ink2); font-weight:700; padding-bottom:6px}
+.count{margin-top:6px; font-size:15px; font-weight:800; color:var(--gold); font-variant-numeric:tabular-nums; letter-spacing:.2px}
+.bar{margin-top:12px; height:6px; border-radius:999px; background:rgba(255,255,255,.07); overflow:hidden}
+.bar i{display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,#8c6a20,#f0c675); width:0%; transition:width .6s ease}
+.hero-foot{display:flex; justify-content:space-between; gap:8px; margin-top:8px; font-size:11px; color:var(--ink3); font-variant-numeric:tabular-nums}
+.hero-steps{display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-top:13px; position:relative}
+.step{background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:11px; padding:8px 8px 7px}
+.step .k{font-size:9.5px; color:var(--ink3); font-weight:800; letter-spacing:.3px}
+.step .v{font-size:12px; font-weight:800; margin-top:2px; letter-spacing:-.2px}
+.step.on{border-color:var(--goldline); background:var(--goldbg)}
+.step.on .v{color:var(--gold)}
+.step .s{font-size:10px; color:var(--ink3); margin-top:1px}
+
+/* ---------- flight ---------- */
+.fl{margin-bottom:12px}
+.fl-top{display:flex; align-items:center; gap:7px; margin-bottom:10px; flex-wrap:wrap}
+.fl-top .no{font-size:15px; font-weight:900; letter-spacing:.4px}
+.fl-top .ap{font-size:11.5px; color:var(--ink3)}
+.fl-row{display:flex; align-items:center; gap:6px}
+.fl-end{flex:0 0 auto; min-width:74px}
+.fl-end b{display:block; font-size:21px; font-weight:800; letter-spacing:-.6px; font-variant-numeric:tabular-nums; line-height:1.1}
+.fl-end .d{font-size:11px; color:var(--ink2); font-variant-numeric:tabular-nums}
+.fl-end .ap{font-size:10.5px; color:var(--ink3); margin-top:1px}
+.fl-end.r{text-align:right}
+.fl-mid{flex:1 1 auto; text-align:center; padding:0 2px; min-width:0}
+.fl-mid .dur{font-size:10.5px; color:var(--ink3); font-variant-numeric:tabular-nums}
+.fl-mid .line{position:relative; height:1px; background:linear-gradient(90deg,transparent,var(--line2),var(--line2),transparent); margin:5px 0}
+.fl-mid .line:after{content:"✈"; position:absolute; left:50%; top:-7px; transform:translateX(-50%); font-size:11px; color:var(--gold); background:var(--card); padding:0 4px}
+.fl-mid .ac{font-size:10px; color:var(--ink3)}
+.fl-foot{display:flex; gap:6px; margin-top:11px; flex-wrap:wrap}
+.fl-foot .kv{font-size:10.5px; color:var(--ink2); background:rgba(255,255,255,.045); border:1px solid var(--line); border-radius:8px; padding:3px 7px; font-variant-numeric:tabular-nums}
+.fl-foot .kv b{color:var(--ink); font-weight:800}
+
+/* ---------- weather ---------- */
+.wx-now{display:flex; align-items:center; gap:12px}
+.wx-ic{font-size:38px; line-height:1}
+.wx-t{font-size:30px; font-weight:900; letter-spacing:-1.6px; line-height:1}
+.wx-t small{font-size:13px; font-weight:700; color:var(--ink3); letter-spacing:0}
+.wx-d{font-size:12px; color:var(--ink2); margin-top:3px}
+.wx-side{margin-left:auto; text-align:right; font-size:11px; color:var(--ink2); line-height:1.6; font-variant-numeric:tabular-nums}
+.wx-side b{color:var(--ink); font-weight:800}
+.wx-days{display:grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:6px; margin-top:13px}
+.wxd{background:rgba(255,255,255,.035); border:1px solid var(--line); border-radius:11px; padding:7px 3px; text-align:center}
+.wxd .dd{font-size:9.5px; color:var(--ink3); font-weight:800}
+.wxd .ii{font-size:15px; margin:2px 0}
+.wxd .tt{font-size:10.5px; font-weight:800; font-variant-numeric:tabular-nums}
+.wxd .tt s{display:block; text-decoration:none; color:var(--ink3); font-size:9.5px; font-weight:700}
+.dress{margin-top:12px; display:flex; gap:9px; background:var(--bluebg); border:1px solid rgba(95,168,255,.22); border-radius:12px; padding:10px 11px}
+.dress .ic{font-size:18px; line-height:1.2}
+.dress p{margin:0; font-size:11.5px; line-height:1.55; color:#cfe2f7}
+.dress b{display:block; font-size:11.5px; margin-bottom:2px; color:#eaf4ff}
+
+/* ---------- checklist ---------- */
+.ck{display:flex; flex-direction:column; gap:1px}
+.ck-row{display:flex; align-items:center; gap:9px; padding:8px 2px; border-bottom:1px solid rgba(255,255,255,.045)}
+.ck-row:last-child{border-bottom:0}
+.ck-box{flex:0 0 auto; width:19px; height:19px; border-radius:6px; border:1.6px solid var(--line2); display:flex; align-items:center; justify-content:center; font-size:11px; color:transparent; background:rgba(255,255,255,.03)}
+.ck-row.on .ck-box{background:var(--green); border-color:var(--green); color:#06251a}
+.ck-row .lb{flex:1 1 auto; font-size:13px; letter-spacing:-.2px}
+.ck-row.on .lb{color:var(--ink3); text-decoration:line-through}
+.ck-row .x{font-size:12px; color:var(--ink3); padding:2px 4px}
+.ck-add{display:flex; gap:7px; margin-top:9px}
+.ck-add input{flex:1 1 auto; height:38px; border-radius:10px; border:1px solid var(--line2); background:rgba(255,255,255,.04); padding:0 11px; font-size:13px}
+.ck-prog{display:flex; align-items:center; gap:8px; margin-top:6px}
+.ck-prog .bar{flex:1 1 auto; margin:0}
+
+/* ---------- places ---------- */
+.chips{display:flex; gap:6px; overflow-x:auto; padding:1px 2px 11px; scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto; font-size:12px; font-weight:800; padding:6px 12px; border-radius:999px;
+  background:rgba(255,255,255,.045); border:1px solid var(--line); color:var(--ink2);
+}
+.chip.on{background:var(--goldbg); border-color:var(--goldline); color:var(--gold)}
+.pl{display:flex; gap:11px; align-items:flex-start; margin-bottom:9px; padding:12px; border-radius:14px; background:linear-gradient(180deg,var(--card),var(--bg2)); border:1px solid var(--line)}
+.pl .ico{flex:0 0 auto; width:36px; height:36px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:17px; background:rgba(255,255,255,.05); border:1px solid var(--line2)}
+.pl .bd{flex:1 1 auto; min-width:0}
+.pl .nm{font-size:14px; font-weight:800; letter-spacing:-.3px; display:flex; align-items:center; gap:6px; flex-wrap:wrap}
+.pl .nm .tag{font-size:9.5px; font-weight:800; padding:1px 6px; border-radius:999px}
+.pl .ad{font-size:11.5px; color:var(--ink2); margin-top:2px; overflow-wrap:anywhere}
+.pl .mt{font-size:11px; color:var(--ink3); margin-top:3px; font-variant-numeric:tabular-nums}
+.pl .mm{font-size:11.5px; color:#cfdced; margin-top:5px; background:rgba(255,255,255,.04); border-radius:8px; padding:5px 8px; overflow-wrap:anywhere}
+.pl .acts{display:flex; gap:5px; margin-top:9px; flex-wrap:wrap}
+.ia{font-size:11px; font-weight:800; padding:4px 9px; border-radius:8px; background:rgba(255,255,255,.05); border:1px solid var(--line2); color:var(--ink2)}
+.ia.gold{color:var(--gold); border-color:var(--goldline); background:var(--goldbg)}
+.ia.blue{color:var(--blue); border-color:rgba(95,168,255,.3); background:var(--bluebg)}
+.ia.red{color:var(--red); border-color:rgba(255,122,107,.3); background:var(--redbg)}
+.empty{text-align:center; padding:22px 14px; color:var(--ink3); font-size:12.5px; line-height:1.6}
+.empty .big{font-size:26px; margin-bottom:6px}
+.recs{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px}
+.rec{font-size:11.5px; font-weight:700; padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.05); border:1px dashed var(--line2); color:var(--ink)}
+
+/* ---------- map ---------- */
+#map{height:calc(100dvh - var(--hdr) - var(--nav) - 128px); min-height:320px; border-radius:var(--r); border:1px solid var(--line); overflow:hidden; background:#0b1523}
+.leaflet-container{background:#0b1523; font-family:inherit}
+.leaflet-popup-content-wrapper{background:#12213a; color:var(--ink); border-radius:12px; border:1px solid var(--line2); box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.leaflet-popup-tip{background:#12213a}
+.leaflet-popup-content{margin:9px 11px; font-size:12px; line-height:1.5}
+.leaflet-popup-content b{font-size:13px}
+.leaflet-popup-content a{color:var(--gold); font-weight:800}
+.leaflet-bar a{background:#14233a; color:#eef4fb; border-color:#243a58}
+.leaflet-bar a:hover{background:#1a2d49}
+.pin{display:flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:50% 50% 50% 6px; transform:rotate(-45deg); font-size:14px; border:2px solid rgba(255,255,255,.85); box-shadow:0 3px 10px rgba(0,0,0,.5)}
+.pin > span{transform:rotate(45deg)}
+.map-legend{display:flex; gap:8px; flex-wrap:wrap; margin-top:9px; font-size:10.5px; color:var(--ink2)}
+.map-legend i{display:inline-block; width:9px; height:9px; border-radius:3px; margin-right:4px; vertical-align:-1px}
+
+/* ---------- money ---------- */
+.money-row{display:flex; align-items:center; gap:8px}
+.money-in{flex:1 1 0; min-width:0; background:rgba(255,255,255,.04); border:1px solid var(--line2); border-radius:12px; padding:9px 11px}
+.money-in .cur{font-size:10.5px; font-weight:800; color:var(--ink3); letter-spacing:.5px}
+.money-in input{width:100%; border:0; background:none; font-size:22px; font-weight:800; letter-spacing:-.6px; font-variant-numeric:tabular-nums; padding:2px 0 0; outline:none}
+.money-swap{flex:0 0 auto; width:34px; height:34px; border-radius:50%; background:var(--goldbg); border:1px solid var(--goldline); color:var(--gold); font-size:15px}
+.rate-line{display:flex; align-items:center; gap:6px; margin-top:11px; font-size:11.5px; color:var(--ink2); flex-wrap:wrap}
+.rate-line b{color:var(--gold); font-variant-numeric:tabular-nums}
+.rate-line .edit{font-size:10.5px; color:var(--ink3); text-decoration:underline; text-underline-offset:2px}
+.quick{display:flex; gap:6px; margin-top:10px; flex-wrap:wrap}
+.quick button{font-size:11.5px; font-weight:800; padding:5px 10px; border-radius:8px; background:rgba(255,255,255,.05); border:1px solid var(--line2); color:var(--ink2)}
+
+/* ---------- survival ---------- */
+.et{display:flex; gap:10px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,.05)}
+.et:last-child{border-bottom:0}
+.et .ic{flex:0 0 auto; font-size:16px; width:22px; text-align:center}
+.et .tx b{display:block; font-size:12.5px; font-weight:800; margin-bottom:2px}
+.et .tx p{margin:0; font-size:11.5px; color:var(--ink2); line-height:1.55}
+.phrase{display:flex; align-items:center; gap:9px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.05)}
+.phrase:last-child{border-bottom:0}
+.phrase .ko{flex:0 0 96px; font-size:11.5px; color:var(--ink2)}
+.phrase .ar{flex:1 1 auto; font-size:12.5px; font-weight:700; direction:rtl; text-align:right}
+.phrase .ro{flex:0 0 auto; font-size:10px; color:var(--ink3); max-width:76px; text-align:right}
+.phrase .cp{flex:0 0 auto; font-size:11px; color:var(--gold)}
+
+/* ---------- chat ---------- */
+.chat{display:flex; flex-direction:column; gap:8px; padding:4px 2px 8px; min-height:120px; max-height:none}
+.msg{display:flex; flex-direction:column; max-width:84%; align-self:flex-start; gap:3px}
+.msg.me{align-self:flex-end; align-items:flex-end}
+.msg .who-s{font-size:10px; color:var(--ink3); font-weight:800; padding:0 3px}
+.msg .bb{background:var(--card2); border:1px solid var(--line); border-radius:14px 14px 14px 5px; padding:8px 11px; font-size:13.5px; line-height:1.5; overflow-wrap:anywhere; white-space:pre-wrap}
+.msg.me .bb{background:linear-gradient(180deg,#f0c675,#d9a651); color:#2a1c06; border-color:#e9bc6c; border-radius:14px 14px 5px 14px; font-weight:600}
+.msg .tm{font-size:9.5px; color:var(--ink3); padding:0 3px; font-variant-numeric:tabular-nums}
+.msg .pic{max-width:210px; border-radius:12px; border:1px solid var(--line2); display:block}
+.msg .del{font-size:10px; color:var(--ink3); text-decoration:underline; margin-top:1px}
+.chat-in{position:sticky; bottom:calc(var(--nav) + env(safe-area-inset-bottom)); background:linear-gradient(180deg,transparent,var(--bg) 26%); padding:8px 0 4px; display:flex; gap:6px; align-items:center; margin-top:4px}
+.chat-in .ph-btn{flex:0 0 auto; width:40px; height:40px; border-radius:12px; background:rgba(255,255,255,.05); border:1px solid var(--line2); font-size:17px}
+.chat-in input[type=text]{flex:1 1 auto; height:42px; border-radius:12px; border:1px solid var(--line2); background:rgba(255,255,255,.05); padding:0 12px; font-size:13.5px; min-width:0}
+.chat-in .snd{flex:0 0 auto; height:42px; padding:0 15px; border-radius:12px; background:linear-gradient(180deg,#f0c675,#d9a651); color:#2a1c06; font-weight:900; font-size:13px}
+.album{display:grid; grid-template-columns:repeat(3,1fr); gap:5px}
+.album button{position:relative; aspect-ratio:1; border-radius:10px; overflow:hidden; background:var(--card2); border:1px solid var(--line)}
+.album img{width:100%; height:100%; object-fit:cover; display:block}
+
+/* ---------- sheet / modal ---------- */
+.sheet{position:fixed; inset:0; z-index:90; background:rgba(3,7,12,.72); backdrop-filter:blur(4px); display:flex; align-items:flex-end; justify-content:center}
+.sheet-in{
+  width:100%; max-width:620px; max-height:92dvh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  background:linear-gradient(180deg,#101d30,#0a1421); border:1px solid var(--line2); border-bottom:0;
+  border-radius:20px 20px 0 0; padding:14px 14px calc(18px + env(safe-area-inset-bottom));
+  animation:up .24s ease;
+}
+@keyframes up{from{transform:translateY(18px); opacity:.6} to{transform:none; opacity:1}}
+.sheet-hd{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px}
+.sheet-hd b{font-size:15.5px; font-weight:800}
+.sheet-hd .x{font-size:17px; color:var(--ink3); padding:2px 6px}
+.field{margin-bottom:11px}
+.field > label{display:block; font-size:11px; font-weight:800; color:var(--ink3); margin-bottom:5px; letter-spacing:.2px}
+.field input,.field textarea,.field select{
+  width:100%; border-radius:11px; border:1px solid var(--line2); background:rgba(255,255,255,.045);
+  padding:10px 11px; font-size:13.5px; outline:none;
+}
+.field input:focus,.field textarea:focus{border-color:var(--goldline); background:rgba(227,180,100,.06)}
+.field textarea{min-height:64px; resize:vertical; line-height:1.5}
+.field .row{display:flex; gap:7px}
+.field .row input{flex:1 1 auto; min-width:0}
+.field .row button{flex:0 0 auto; padding:0 12px; border-radius:11px; font-size:12.5px; font-weight:800; background:var(--goldbg); color:var(--gold); border:1px solid var(--goldline)}
+.f2{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.seg{display:grid; grid-template-columns:repeat(4,1fr); gap:5px}
+.seg button{font-size:11.5px; font-weight:800; padding:9px 2px; border-radius:10px; background:rgba(255,255,255,.04); border:1px solid var(--line); color:var(--ink2); display:flex; flex-direction:column; gap:3px; align-items:center}
+.seg button.on{border-color:var(--goldline); background:var(--goldbg); color:var(--gold)}
+.seg button .e{font-size:14px; line-height:1}
+.geo-res{margin-top:6px; display:flex; flex-direction:column; gap:4px}
+.geo-res button{text-align:left; font-size:11.5px; line-height:1.4; padding:7px 9px; border-radius:9px; background:rgba(255,255,255,.05); border:1px solid var(--line2); color:var(--ink2)}
+.geo-res button b{color:var(--ink); display:block; font-size:12px; font-weight:800}
+.sheet-foot{display:flex; gap:7px; margin-top:14px}
+.sheet-foot .btn{flex:1 1 0}
+
+/* taxi card */
+.taxi{align-items:center; padding:16px}
+.taxi-card{
+  width:100%; max-width:520px; background:#fffdf7; color:#0b1523; border-radius:20px;
+  padding:22px 20px 18px; box-shadow:0 20px 60px rgba(0,0,0,.6);
+  max-height:92dvh; overflow-y:auto;
+}
+.taxi-card .tc-lbl{font-size:12px; font-weight:900; letter-spacing:1.4px; color:#b08534; text-transform:uppercase}
+.taxi-card .tc-name{font-size:26px; font-weight:900; letter-spacing:-.8px; line-height:1.15; margin-top:8px; overflow-wrap:anywhere}
+.taxi-card .tc-addr{font-size:18px; font-weight:700; line-height:1.4; margin-top:10px; overflow-wrap:anywhere; color:#1d2b3d}
+.taxi-card .tc-ar{font-size:26px; font-weight:800; text-align:right; margin-top:18px; padding-top:16px; border-top:2px dashed #e2d6bd; line-height:1.6}
+.taxi-card .tc-en{font-size:16px; font-weight:700; color:#3d4c60; margin-top:8px}
+.taxi-card .tc-ll{font-size:12px; color:#6b7c90; margin-top:14px; font-variant-numeric:tabular-nums}
+.taxi-card .tc-close{margin-top:18px; width:100%; height:52px; border-radius:14px; background:#0b1523; color:#fff; font-size:15px; font-weight:800}
+
+/* who modal */
+.who-wrap{width:100%; max-width:420px; margin:auto; padding:0 16px; text-align:center}
+.who-wrap .q{font-size:18px; font-weight:900; margin-bottom:4px}
+.who-wrap .sub{font-size:12.5px; color:var(--ink2); margin-bottom:16px}
+.who-btns{display:grid; gap:9px}
+.who-btn{display:flex; align-items:center; gap:12px; padding:15px 16px; border-radius:16px; background:linear-gradient(180deg,var(--card2),var(--bg2)); border:1px solid var(--line2); text-align:left}
+.who-btn .av{width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; background:var(--goldbg); border:1px solid var(--goldline)}
+.who-btn.blue .av{background:var(--bluebg); border-color:rgba(95,168,255,.32)}
+.who-btn b{display:block; font-size:15px; font-weight:900}
+.who-btn span{font-size:11.5px; color:var(--ink3)}
+
+/* lightbox / toast */
+.lb{position:fixed; inset:0; z-index:95; background:rgba(2,5,9,.94); display:flex; align-items:center; justify-content:center; padding:14px}
+.lb img{max-width:100%; max-height:88dvh; border-radius:12px}
+.lb .x{position:absolute; top:calc(12px + env(safe-area-inset-top)); right:14px; font-size:26px; color:#fff; opacity:.85}
+.toast{
+  position:fixed; left:50%; bottom:calc(var(--nav) + env(safe-area-inset-bottom) + 16px); transform:translateX(-50%) translateY(8px);
+  background:rgba(20,35,58,.98); border:1px solid var(--line2); color:var(--ink); font-size:12.75px; font-weight:700;
+  padding:9px 15px; border-radius:999px; z-index:100; opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; max-width:calc(100% - 32px); text-align:center; box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+.toast.on{opacity:1; transform:translateX(-50%) translateY(0)}
+.spin{display:inline-block; width:14px; height:14px; border:2px solid rgba(227,180,100,.28); border-top-color:var(--gold); border-radius:50%; animation:sp .7s linear infinite; vertical-align:-2px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (max-width:360px){
+  .dday .num{font-size:42px}
+  .fl-end b{font-size:19px}
+  .wx-t{font-size:26px}
+  .seg button{font-size:10.5px}
+}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr-in">
+    <div class="hrow">
+      <div class="brand"><span class="flag">🇦🇪</span><b>DUBAI</b><span class="sub">건우 출장 가이드 · 12.5–12.12</span></div>
+      <button class="who" id="whoBtn"><span id="whoTxt">누구세요?</span><span style="opacity:.7">▾</span></button>
+    </div>
+    <div class="clocks">
+      <div class="clk">
+        <div class="lbl">서울 <em>KST</em></div>
+        <b id="clkKst">--:--</b>
+        <div class="dt" id="dtKst">--</div>
+      </div>
+      <div class="mid"><div class="diff" id="diffTxt">-5h</div></div>
+      <div class="clk gst">
+        <div class="lbl">두바이 <em>GST</em></div>
+        <b id="clkGst">--:--</b>
+        <div class="dt" id="dtGst">--</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="banner" id="banner" hidden></div>
+
+  <!-- ================= HOME ================= -->
+  <section class="page" id="pgHome">
+    <div class="card hero">
+      <div class="hero-top">
+        <span class="pill" id="phasePill">출국까지</span>
+        <span class="muted" id="phaseNote" style="font-size:11px"></span>
+      </div>
+      <div class="dday">
+        <div class="num" id="ddayNum">D-10</div>
+        <div class="cap" id="ddayCap">12월 5일(토) 23:40 인천 T1 출발</div>
+      </div>
+      <div class="count" id="countdown">--일 --:--:--</div>
+      <div class="bar"><i id="heroBar"></i></div>
+      <div class="hero-foot"><span id="heroFrom">—</span><span id="heroTo">—</span></div>
+      <div class="hero-steps" id="heroSteps"></div>
+    </div>
+
+    <div class="ph"><h2>항공편</h2><span class="sp"></span><span class="cnt">에미레이트항공 운항 · A380-800</span></div>
+    <div class="card fl">
+      <div class="fl-top">
+        <span class="pill">출국 OUT</span>
+        <span class="no">KE5951</span>
+        <span class="ap">Emirates 항공편명 EK / 좌석은 탑승권 확인</span>
+      </div>
+      <div class="fl-row">
+        <div class="fl-end">
+          <b>23:40</b><div class="d">12.5 (토)</div><div class="ap">인천 ICN · T1</div>
+        </div>
+        <div class="fl-mid">
+          <div class="dur">10시간 25분</div>
+          <div class="line"></div>
+          <div class="ac">직항 · A380-800</div>
+        </div>
+        <div class="fl-end r">
+          <b>05:05</b><div class="d">12.6 (일)</div><div class="ap">두바이 DXB · T3</div>
+        </div>
+      </div>
+      <div class="fl-foot">
+        <span class="kv">현지 도착 <b>05:05 GST</b></span>
+        <span class="kv">시차 <b>-5시간</b></span>
+        <span class="kv">입국심사 <b>+30~60분</b></span>
+      </div>
+    </div>
+
+    <div class="card fl">
+      <div class="fl-top">
+        <span class="pill blue">귀국 RET</span>
+        <span class="no">KE5952</span>
+        <span class="ap">두바이 → 인천</span>
+      </div>
+      <div class="fl-row">
+        <div class="fl-end">
+          <b>03:30</b><div class="d">12.12 (토)</div><div class="ap">두바이 DXB · T3</div>
+        </div>
+        <div class="fl-mid">
+          <div class="dur">8시간 25분</div>
+          <div class="line"></div>
+          <div class="ac">직항 · A380-800</div>
+        </div>
+        <div class="fl-end r">
+          <b>16:55</b><div class="d">12.12 (토)</div><div class="ap">인천 ICN · T1</div>
+        </div>
+      </div>
+      <div class="fl-foot">
+        <span class="kv">공항 도착 권장 <b>00:30</b></span>
+        <span class="kv">체크인 마감 <b>02:30</b></span>
+      </div>
+    </div>
+
+    <div class="ph"><h2>두바이 날씨</h2><span class="sp"></span><span class="cnt" id="wxUpd">—</span></div>
+    <div class="card" id="wxCard">
+      <div class="wx-now">
+        <div class="wx-ic" id="wxIcon">🌤️</div>
+        <div>
+          <div class="wx-t"><span id="wxTemp">--</span><small>°C</small></div>
+          <div class="wx-d" id="wxDesc">불러오는 중…</div>
+        </div>
+        <div class="wx-side" id="wxSide"></div>
+      </div>
+      <div class="wx-days" id="wxDays"></div>
+      <div class="dress">
+        <div class="ic">🧥</div>
+        <p><b>12월 두바이 복장</b>낮은 26~30°C로 반팔·린넨이 편하지만, <b>밤엔 16~19°C</b>까지 떨어져 얇은 겉옷이 필수. 실내(몰·오피스·전시장) 에어컨이 강해서 <b>카디건·자켓 한 벌</b>은 항상 들고 다니기. 출장 자리엔 셔츠+재킷, 사원·모스크 방문 시 어깨·무릎 가리기.</p>
+      </div>
+    </div>
+
+    <div class="ph"><h2>출장 준비물</h2><span class="sp"></span><span class="cnt" id="ckCnt">0/0</span></div>
+    <div class="card tight">
+      <div class="ck-prog"><div class="bar"><i id="ckBar"></i></div></div>
+      <div class="ck" id="ckList"></div>
+      <div class="ck-add">
+        <input id="ckInput" placeholder="준비물 추가 (예: 명함)" maxlength="40">
+        <button class="mini" id="ckAdd">추가</button>
+      </div>
+    </div>
+
+    <div class="ph"><h2>숙소 · 출장지</h2><span class="sp"></span><button class="mini" data-goto="places">전체 보기</button></div>
+    <div id="homePlaces"></div>
+  </section>
+
+  <!-- ================= PLACES ================= -->
+  <section class="page" id="pgPlaces" hidden>
+    <div class="ph">
+      <h2>장소</h2><span class="cnt" id="placeCnt"></span><span class="sp"></span>
+      <button class="mini" id="addPlaceTop">+ 장소 추가</button>
+    </div>
+    <div class="chips" id="placeFilters">
+      <button class="chip on" data-cat="all">전체</button>
+      <button class="chip" data-cat="숙소">🏨 숙소</button>
+      <button class="chip" data-cat="출장지">💼 출장지</button>
+      <button class="chip" data-cat="맛집">🍽️ 맛집·카페</button>
+      <button class="chip" data-cat="관광">📸 관광·쇼핑</button>
+    </div>
+    <div id="placeList"></div>
+    <div class="card tight" id="recBox">
+      <div style="display:flex;align-items:center;gap:8px">
+        <b style="font-size:13px">원클릭 추천 스팟</b><span class="sp" style="flex:1"></span>
+        <span class="muted" style="font-size:10.5px">눌러서 내 목록에 추가</span>
+      </div>
+      <div class="recs" id="recList"></div>
+    </div>
+  </section>
+
+  <!-- ================= MAP ================= -->
+  <section class="page" id="pgMap" hidden>
+    <div class="ph"><h2>지도</h2><span class="sp"></span><span class="cnt" id="mapCnt"></span></div>
+    <div id="map"></div>
+    <div class="map-legend">
+      <span><i style="background:#e3b464"></i>숙소</span>
+      <span><i style="background:#5fa8ff"></i>출장지</span>
+      <span><i style="background:#ffa26b"></i>맛집·카페</span>
+      <span><i style="background:#5fd39a"></i>관광·쇼핑</span>
+      <span><i style="background:#d9dde3"></i>공항</span>
+      <span class="dim">핀을 누르면 길찾기</span>
+    </div>
+  </section>
+
+  <!-- ================= COUPLE ================= -->
+  <section class="page" id="pgCouple" hidden>
+    <div class="ph">
+      <h2>영진 ↔ 건우</h2><span class="sp"></span>
+      <div class="chips" style="padding:0">
+        <button class="chip on" data-ctab="chat">💬 톡·메모</button>
+        <button class="chip" data-ctab="album">📷 사진첩</button>
+      </div>
+    </div>
+    <div id="ctChat">
+      <div class="card tight" style="padding:10px 12px">
+        <div class="chat" id="chatList"></div>
+        <div class="chat-in">
+          <button class="ph-btn" id="chatPhoto">📷</button>
+          <input type="file" id="chatFile" accept="image/*" hidden>
+          <input type="text" id="chatInput" placeholder="메시지 남기기" maxlength="500">
+          <button class="snd" id="chatSend">전송</button>
+        </div>
+      </div>
+    </div>
+    <div id="ctAlbum" hidden>
+      <div class="card tight">
+        <div class="album" id="albumGrid"></div>
+        <div class="empty" id="albumEmpty"><div class="big">📷</div>아직 사진이 없어요.<br>톡에서 사진을 보내면 여기 모여요.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EXTRA ================= -->
+  <section class="page" id="pgExtra" hidden>
+    <div class="ph"><h2>환율 계산기</h2><span class="sp"></span><span class="cnt" id="rateUpd">—</span></div>
+    <div class="card">
+      <div class="money-row">
+        <div class="money-in">
+          <div class="cur">AED · 디르함</div>
+          <input id="amtAed" type="text" inputmode="decimal" value="100" autocomplete="off">
+        </div>
+        <button class="money-swap" id="moneySwap" title="방향 전환">⇄</button>
+        <div class="money-in">
+          <div class="cur">KRW · 원</div>
+          <input id="amtKrw" type="text" inputmode="decimal" value="" autocomplete="off">
+        </div>
+      </div>
+      <div class="rate-line">
+        <span>1 AED =</span><b id="rateVal">—</b><span>KRW</span>
+        <span class="dim" style="font-size:10.5px" id="rateSrc"></span>
+        <span class="sp" style="flex:1"></span>
+        <button class="edit" id="rateEdit">환율 직접 수정</button>
+      </div>
+      <div class="quick">
+        <button data-aed="20">20 AED</button>
+        <button data-aed="50">50 AED</button>
+        <button data-aed="100">100 AED</button>
+        <button data-aed="500">500 AED</button>
+        <button data-aed="1000">1,000 AED</button>
+      </div>
+    </div>
+
+    <div class="ph"><h2>택시·주문 카드</h2><span class="sp"></span><span class="cnt">기사님께 화면 그대로 보여주기</span></div>
+    <div class="card tight">
+      <div id="taxiList"></div>
+      <div class="empty" id="taxiEmpty" style="padding:12px 4px">숙소·출장지를 먼저 등록하면<br>큰 글씨 택시 카드를 만들 수 있어요.</div>
+    </div>
+
+    <div class="ph"><h2>두바이 생존 카드</h2></div>
+    <div class="card tight">
+      <div class="et"><div class="ic">🕌</div><div class="tx"><b>복장·공공 예절</b><p>몰·호텔은 자유롭지만 사원·관공서는 어깨·무릎을 가릴 것. 라마단 기간 낮 시간 공공장소 취식·흡연은 피하기.</p></div></div>
+      <div class="et"><div class="ic">📷</div><div class="tx"><b>촬영 제한</b><p>정부청사·군사시설·공항 보안구역 촬영 금지. 현지인 얼굴은 양해를 구하고, 여성 사진은 특히 조심.</p></div></div>
+      <div class="et"><div class="ic">💏</div><div class="tx"><b>애정 표현</b><p>공공장소 과한 스킨십은 민원 대상. 손잡기 정도는 괜찮지만 키스·포옹은 자제. (영상통화도 공공장소에선 조용히)</p></div></div>
+      <div class="et"><div class="ic">🍺</div><div class="tx"><b>주류 규정</b><p>호텔·라이선스 매장·바에서만 음주 가능. 길거리·공원 음주는 금지. 만 21세 이상, 여권 확인. 자택 반입은 한도 내.</p></div></div>
+      <div class="et"><div class="ic">🚇</div><div class="tx"><b>Nol 카드·교통</b><p>지하철·버스·택시 일부 결제되는 교통카드. 지하철역 발매기에서 구매·충전(현금/카드). 골드 수크 방향은 메트로가 빠름.</p></div></div>
+      <div class="et"><div class="ic">🚕</div><div class="tx"><b>택시·Careem</b><p>공식 택시(크림색)는 미터기 사용. 앱은 <b>Careem</b>이나 <b>Uber</b>. 공항 탑승은 T3 지정 승강장. 미터기 켜달라고 요청.</p></div></div>
+      <div class="et"><div class="ic">💳</div><div class="tx"><b>돈·팁</b><p>카드 대부분 가능(비자·마스터). 팁은 레스토랑 10~15%, 택시는 잔돈 정도. AED 현금 100~200은 비상용으로.</p></div></div>
+      <div class="et"><div class="ic">🌡️</div><div class="tx"><b>더위·수분</b><p>한낮 자외선 매우 강함. 선크림·선글라스·모자 필수, 물 자주. 실내외 온도차 10°C 이상이라 겉옷 필수.</p></div></div>
+      <div class="et"><div class="ic">🆘</div><div class="tx"><b>비상 연락</b><p>경찰 999 · 구급 998 · 소방 997. 한국 영사관(두바이) +971-4-344-9200. 여권 분실 시 영사관 → 경찰 신고서.</p></div></div>
+      <div class="et"><div class="ic">🔌</div><div class="tx"><b>전원·통신</b><p>220V 50Hz, <b>G형(영국식 3핀)</b> — 어댑터 필수. 유심은 공항 T3에서 여권으로 구매(du/Etisalat), eSIM이면 미리 개통.</p></div></div>
+    </div>
+
+    <div class="ph"><h2>아랍어·영어 생존 문구</h2><span class="sp"></span><span class="cnt">눌러서 복사</span></div>
+    <div class="card tight" id="phraseBox"></div>
+    <div style="height:6px"></div>
+  </section>
+</main>
+
+<nav class="nav" id="nav">
+  <button data-pg="home" class="on"><span class="ic">🏠</span>홈</button>
+  <button data-pg="places"><span class="ic">📍</span>장소</button>
+  <button data-pg="map"><span class="ic">🗺️</span>지도</button>
+  <button data-pg="couple"><span class="ic">💌</span>커플</button>
+  <button data-pg="extra"><span class="ic">🧭</span>생존</button>
+</nav>
+
+<!-- ============ place sheet ============ -->
+<div class="sheet" id="placeSheet" hidden>
+  <div class="sheet-in">
+    <div class="sheet-hd"><b id="psTitle">장소 추가</b><button class="x" id="psClose">✕</button></div>
+    <div class="field">
+      <label>구분</label>
+      <div class="seg" id="psCat">
+        <button data-cat="숙소" class="on"><span class="e">🏨</span>숙소</button>
+        <button data-cat="출장지"><span class="e">💼</span>출장지</button>
+        <button data-cat="맛집"><span class="e">🍽️</span>맛집·카페</button>
+        <button data-cat="관광"><span class="e">📸</span>관광·쇼핑</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>장소명 *</label>
+      <input id="psName" placeholder="예: 두바이 마리나 호텔" maxlength="80">
+    </div>
+    <div class="field">
+      <label>주소 / 위치</label>
+      <div class="row">
+        <input id="psAddr" placeholder="주소 또는 장소명으로 검색" maxlength="160">
+        <button id="psSearch">🔍 검색</button>
+      </div>
+      <div class="geo-res" id="psGeoRes"></div>
+    </div>
+    <div class="field">
+      <label>좌표 (검색하면 자동 입력 · 직접 입력 가능)</label>
+      <div class="f2">
+        <input id="psLat" placeholder="위도 25.2048" inputmode="decimal">
+        <input id="psLng" placeholder="경도 55.2708" inputmode="decimal">
+      </div>
+    </div>
+    <div class="field">
+      <label>날짜 / 시간 (체크인·방문 예정)</label>
+      <div class="f2">
+        <input id="psStart" type="datetime-local">
+        <input id="psEnd" type="datetime-local">
+      </div>
+    </div>
+    <div class="field">
+      <label>메모 · 예약번호</label>
+      <textarea id="psMemo" placeholder="예약번호, 체크인 시간, 담당자 연락처 등" maxlength="600"></textarea>
+    </div>
+    <div class="sheet-foot">
+      <button class="btn primary" id="psSave">저장</button>
+      <button class="btn danger" id="psDel" hidden>삭제</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ taxi sheet ============ -->
+<div class="sheet taxi" id="taxiSheet" hidden>
+  <div class="taxi-card">
+    <div class="tc-lbl">TAXI · 이 주소로 가주세요</div>
+    <div class="tc-name" id="tcName">—</div>
+    <div class="tc-addr" id="tcAddr">—</div>
+    <div class="tc-ar">إلى هذا العنوان من فضلك</div>
+    <div class="tc-en">Please take me to this address.</div>
+    <div class="tc-ll" id="tcLL"></div>
+    <button class="tc-close" id="tcClose">닫기</button>
+  </div>
+</div>
+
+<!-- ============ who sheet ============ -->
+<div class="sheet" id="whoSheet" hidden>
+  <div class="who-wrap">
+    <div class="q">👋 지금 접속한 사람이 누구야?</div>
+    <div class="sub">이 이름으로 톡·사진·장소가 기록돼</div>
+    <div class="who-btns">
+      <button class="who-btn" data-who="건우">
+        <div class="av">🧑‍💼</div>
+        <div><b>건우</b><span>두바이 가는 사람</span></div>
+      </button>
+      <button class="who-btn blue" data-who="영진">
+        <div class="av">🌿</div>
+        <div><b>영진</b><span>집에서 기다리는 사람</span></div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="lb" id="lightbox" hidden><button class="x" id="lbClose">✕</button><img id="lbImg" alt="사진"></div>
+<div class="toast" id="toast"></div>
+<script>
+window.__errs=[];
+window.addEventListener('error',function(e){ try{ window.__errs.push(String(e.message)+' @'+(e.filename||'')+':'+(e.lineno||'')); }catch(x){} });
+window.addEventListener('unhandledrejection',function(e){ try{ window.__errs.push('promise: '+String(e.reason&&e.reason.message||e.reason)); }catch(x){} });
+
+/* ================= config ================= */
+const SUPA='https://yyahsgkiwgquixwusocy.supabase.co';
+const SUPA_KEY='sb_publishable_RYL27ixp-NF5YxThJapOxg_3zhW6wLi';
+const BUCKET='dubai-photos';
+
+const TRIP={
+  dep:'2026-12-05T23:40:00+09:00',
+  arr:'2026-12-06T05:05:00+04:00',
+  ret:'2026-12-12T03:30:00+04:00',
+  home:'2026-12-12T16:55:00+09:00'
+};
+const DEP=new Date(TRIP.dep), ARR=new Date(TRIP.arr), RET=new Date(TRIP.ret), HOME=new Date(TRIP.home);
+
+const CATS={
+  '숙소':{e:'🏨', c:'#e3b464', bg:'rgba(227,180,100,.14)', bd:'rgba(227,180,100,.34)'},
+  '출장지':{e:'💼', c:'#5fa8ff', bg:'rgba(95,168,255,.14)', bd:'rgba(95,168,255,.34)'},
+  '맛집':{e:'🍽️', c:'#ffa26b', bg:'rgba(255,162,107,.14)', bd:'rgba(255,162,107,.34)'},
+  '관광':{e:'📸', c:'#5fd39a', bg:'rgba(95,211,154,.14)', bd:'rgba(95,211,154,.34)'}
+};
+const AIRPORT={name:'두바이국제공항 T3', addr:'Dubai International Airport, Terminal 3', lat:25.2532, lng:55.3657, cat:'공항'};
+
+const RECS=[
+  {name:'두바이몰 · 부르즈 할리파', addr:'Dubai Mall, Financial Center Rd', lat:25.1972, lng:55.2744, cat:'관광'},
+  {name:'미래박물관', addr:'Museum of the Future, Sheikh Zayed Rd', lat:25.2353, lng:55.2952, cat:'관광'},
+  {name:'두바이 프레임', addr:'Dubai Frame, Zabeel Park', lat:25.2355, lng:55.3003, cat:'관광'},
+  {name:'주메이라 비치', addr:'Jumeirah Beach, Dubai', lat:25.2048, lng:55.2372, cat:'관광'},
+  {name:'두바이 마리나', addr:'Dubai Marina, Dubai', lat:25.0805, lng:55.1403, cat:'관광'},
+  {name:'골드 수크', addr:'Gold Souk, Deira, Dubai', lat:25.2686, lng:55.2969, cat:'관광'},
+  {name:'알 파히디 역사지구', addr:'Al Fahidi Historical Neighbourhood', lat:25.2637, lng:55.2972, cat:'관광'},
+  {name:'라 메르 비치', addr:'La Mer Beach, Jumeirah 1', lat:25.2108, lng:55.2436, cat:'관광'},
+  {name:'DIFC 게이트 빌리지', addr:'Gate Village, DIFC, Dubai', lat:25.2119, lng:55.2822, cat:'맛집'},
+  {name:'이븐 바투타 몰', addr:'Ibn Battuta Mall, Sheikh Zayed Rd', lat:25.0447, lng:55.1185, cat:'관광'}
+];
+
+const CK_DEFAULT=[
+  ['여권 (잔여 6개월 이상)',true],['두바이 무비자 입국 확인',true],['항공권 e-티켓 출력/저장',true],
+  ['숙소 예약 확인서',false],['여행자보험 가입',false],['eSIM 또는 로밍 준비',false],
+  ['G형(영국식) 멀티 어댑터',false],['보조배터리·충전기',false],['상비약(소화제·해열제·밴드)',false],
+  ['출장 정장·셔츠·구두',false],['선크림·선글라스·모자',false],['얇은 겉옷(실내 에어컨)',false],
+  ['명함·회사 소개자료',false],['AED 현금 100~200',false],['보조 신발·양말 여유분',false]
+];
+
+const PHRASES=[
+  {ko:'이 주소로 가주세요', ar:'إلى هذا العنوان من فضلك', ro:'ila hatha al-unwan min fadlik'},
+  {ko:'여기서 세워주세요', ar:'توقف هنا من فضلك', ro:'tawaqqaf huna min fadlik'},
+  {ko:'얼마예요?', ar:'كم الثمن؟', ro:'kam al-thaman?'},
+  {ko:'카드로 결제할게요', ar:'سأدفع بالبطاقة', ro:'sa-adfa\' bil-bitaqa'},
+  {ko:'물 한 병 주세요', ar:'ماء من فضلك', ro:'maa min fadlik'},
+  {ko:'화장실이 어디예요?', ar:'أين الحمام؟', ro:'ayna al-hammam?'},
+  {ko:'영어 할 수 있으세요?', ar:'هل تتحدث الإنجليزية؟', ro:'hal tatahaddath al-injliziyya?'},
+  {ko:'도와주세요', ar:'ساعدني من فضلك', ro:'sa\'idni min fadlik'},
+  {ko:'예약했어요 (이름: 고건우)', ar:'لدي حجز باسم غو كون-وو', ro:'ladayya hajz bism Go Gunwoo'},
+  {ko:'계산서 주세요', ar:'الفاتورة من فضلك', ro:'al-fatura min fadlik'}
+];
+
+/* ================= helpers ================= */
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const pad=n=>String(n).padStart(2,'0');
+const nf=n=>Number(n||0).toLocaleString('ko-KR');
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('on'),2200); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function isoLocal(v){ if(!v) return ''; const d=new Date(v); if(isNaN(d)) return ''; const p=n=>pad(n); return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'T'+p(d.getHours())+':'+p(d.getMinutes()); }
+function whenText(s,e){
+  const f=v=>{ if(!v) return ''; const d=new Date(v); if(isNaN(d)) return String(v);
+    return (d.getMonth()+1)+'/'+d.getDate()+'('+'일월화수목금토'[d.getDay()]+') '+pad(d.getHours())+':'+pad(d.getMinutes()); };
+  const a=f(s), b=f(e);
+  if(a&&b) return a+' → '+b;
+  if(a) return a;
+  if(b) return '~ '+b;
+  return '';
+}
+function mapsLink(p){
+  if(p.lat!=null && p.lng!=null && p.lat!=='' && p.lng!=='') return 'https://www.google.com/maps/dir/?api=1&destination='+p.lat+','+p.lng;
+  return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent((p.name||'')+' '+(p.address||''));
+}
+function saving(s){ const b=$('#psSave'); if(b){ b.disabled=!!s; b.textContent=s?'저장 중…':'저장'; } }
+
+/* ================= clock / dday ================= */
+const fmtK=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',hour12:false});
+const fmtKD=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',month:'numeric',day:'numeric',weekday:'short'});
+const fmtG=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Dubai',hour:'2-digit',minute:'2-digit',hour12:false});
+const fmtGD=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Dubai',month:'numeric',day:'numeric',weekday:'short'});
+
+function tickClock(){
+  const now=new Date();
+  $('#clkKst').textContent=fmtK.format(now);
+  $('#dtKst').textContent=fmtKD.format(now);
+  $('#clkGst').textContent=fmtG.format(now);
+  $('#dtGst').textContent=fmtGD.format(now);
+  tickDday(now);
+}
+function tickDday(now){
+  let phase='출국까지', target=DEP, num, cap, from, to;
+  if(now<DEP){
+    const left=DEP-now;
+    const days=Math.ceil(left/86400000);
+    num='D-'+(days<=0?'DAY':days);
+    cap='12월 5일(토) 23:40 · 인천 T1 출발';
+    const total=DEP-new Date('2026-11-25T00:00:00+09:00');
+    const pct=Math.max(0,Math.min(100,((total-(left))/total)*100));
+    $('#heroBar').style.width=pct.toFixed(1)+'%';
+    from='오늘 '+fmtKD.format(now); to='출국 12.05 23:40';
+  } else if(now<RET){
+    phase='두바이 체류 중'; target=RET;
+    const dayNo=Math.floor((now-ARR)/86400000)+1;
+    num='D+'+dayNo;
+    cap='귀국편 12월 12일(토) 03:30 두바이 T3 출발';
+    const total=RET-DEP, pct=Math.max(0,Math.min(100,((now-DEP)/total)*100));
+    $('#heroBar').style.width=pct.toFixed(1)+'%';
+    from='두바이 '+fmtGD.format(now); to='귀국 12.12 03:30';
+  } else {
+    phase = now<HOME ? '귀국편 탑승 중' : '출장 종료';
+    target=HOME; num = now<HOME ? 'HOME' : 'DONE';
+    cap = now<HOME ? '12월 12일(토) 16:55 인천 T1 도착' : '12월 12일(토) 16:55 인천 도착 완료';
+    $('#heroBar').style.width='100%';
+    from='두바이 출발'; to='인천 16:55';
+  }
+  $('#phasePill').textContent=phase;
+  $('#ddayNum').textContent=num;
+  $('#ddayCap').textContent=cap;
+  $('#heroFrom').textContent=from; $('#heroTo').textContent=to;
+  const left=target-now;
+  if(left>0){
+    const d=Math.floor(left/86400000), h=Math.floor(left%86400000/3600000), m=Math.floor(left%3600000/60000), s=Math.floor(left%60000/1000);
+    $('#countdown').textContent=(d>0? d+'일 ':'')+pad(h)+':'+pad(m)+':'+pad(s)+' 남음';
+  } else {
+    $('#countdown').textContent='도착 완료';
+  }
+}
+function buildSteps(){
+  const steps=[
+    {k:'출국', v:'12.05 23:40', s:'인천 T1', at:DEP},
+    {k:'두바이 도착', v:'12.06 05:05', s:'DXB T3', at:ARR},
+    {k:'귀국편 출발', v:'12.12 03:30', s:'DXB T3', at:RET},
+    {k:'인천 도착', v:'12.12 16:55', s:'ICN T1', at:HOME}
+  ];
+  const now=new Date();
+  let cur=steps.findIndex(x=>x.at>now);
+  if(cur<0) cur=steps.length-1;
+  return steps.map((x,i)=>'<div class="step '+(i===cur?'on':'')+'"><div class="k">'+x.k+'</div><div class="v">'+x.v+'</div><div class="s">'+x.s+'</div></div>').join('');
+}
+
+/* ================= weather ================= */
+const WMO={0:['맑음','☀️'],1:['대체로 맑음','🌤️'],2:['구름 조금','⛅'],3:['흐림','☁️'],45:['안개','🌫️'],48:['짙은 안개','🌫️'],
+  51:['약한 이슬비','🌦️'],53:['이슬비','🌦️'],55:['강한 이슬비','🌦️'],56:['어는 이슬비','🌧️'],57:['어는 이슬비','🌧️'],
+  61:['약한 비','🌦️'],63:['비','🌧️'],65:['강한 비','🌧️'],66:['어는 비','🌧️'],67:['어는 비','🌧️'],
+  71:['약한 눈','🌨️'],73:['눈','🌨️'],75:['강한 눈','❄️'],80:['소나기','🌦️'],81:['소나기','🌧️'],82:['강한 소나기','⛈️'],
+  95:['천둥번개','⛈️'],96:['천둥번개·우박','⛈️'],99:['천둥번개·우박','⛈️']};
+function wmo(c){ return WMO[c]||['—','🌡️']; }
+async function loadWeather(){
+  try{
+    const u='https://api.open-meteo.com/v1/forecast?latitude=25.2048&longitude=55.2708'
+      +'&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m'
+      +'&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max'
+      +'&timezone=Asia%2FDubai&forecast_days=7';
+    const r=await fetch(u,{cache:'no-store'});
+    if(!r.ok) throw new Error('weather '+r.status);
+    const d=await r.json();
+    const c=d.current, [wd,ic]=wmo(c.weather_code);
+    $('#wxIcon').textContent=ic;
+    $('#wxTemp').textContent=Math.round(c.temperature_2m);
+    $('#wxDesc').textContent=wd+' · 체감 '+Math.round(c.apparent_temperature)+'°C';
+    $('#wxSide').innerHTML='습도 <b>'+c.relative_humidity_2m+'%</b><br>바람 <b>'+c.wind_speed_10m.toFixed(1)+' m/s</b><br><span class="dim">두바이 · DXB 기준</span>';
+    const days=(d.daily.time||[]).map((t,i)=>({t:t,c:d.daily.weather_code[i],mx:d.daily.temperature_2m_max[i],mn:d.daily.temperature_2m_min[i]}));
+    $('#wxDays').innerHTML=days.map(x=>{
+      const dt=new Date(x.t+'T12:00:00');
+      const [,ei]=wmo(x.c);
+      return '<div class="wxd"><div class="dd">'+(dt.getMonth()+1)+'/'+dt.getDate()+'</div><div class="ii">'+ei+'</div><div class="tt">'+Math.round(x.mx)+'°<s>'+Math.round(x.mn)+'°</s></div></div>';
+    }).join('');
+    $('#wxUpd').textContent=(c.time||'').slice(11,16)+' 기준 · Open-Meteo';
+  }catch(e){
+    $('#wxDesc').textContent='날씨를 불러오지 못했어요';
+    $('#wxUpd').textContent='연결 실패';
+  }
+}
+
+/* ================= rate ================= */
+const RATE_FALLBACK=365.7;
+const rate={val:RATE_FALLBACK, manual:false, src:'기본값'};
+function loadRate(){
+  let m=null;
+  try{ m=JSON.parse(localStorage.getItem('dubai.rate')||'null'); }catch(e){}
+  if(m && m.val){ rate.val=+m.val; rate.manual=true; rate.src='직접 설정'; paintRate(); }
+  const ctl=('AbortController' in window)? new AbortController():null;
+  if(ctl) setTimeout(()=>ctl.abort(),8000);
+  fetch('https://open.er-api.com/v6/latest/AED',ctl?{signal:ctl.signal,cache:'no-store'}:{cache:'no-store'})
+    .then(r=>r.json())
+    .then(d=>{
+      const v=d && d.rates && d.rates.KRW;
+      if(!v) throw new Error('no rate');
+      if(!rate.manual){ rate.val=+v; rate.src='실시간'; }
+      $('#rateUpd').textContent=(d.time_last_update_utc||'').slice(5,16)+' 기준';
+      paintRate();
+    })
+    .catch(()=>{ $('#rateUpd').textContent='기본 환율 사용'; });
+}
+function paintRate(){
+  $('#rateVal').textContent=rate.val.toFixed(2);
+  $('#rateSrc').textContent='('+rate.src+')';
+  convAed2Krw();
+}
+function convAed2Krw(){
+  const a=parseFloat(($('#amtAed').value||'').replace(/,/g,''));
+  $('#amtKrw').value=isNaN(a)?'':nf(Math.round(a*rate.val));
+}
+function convKrw2Aed(){
+  const k=parseFloat(($('#amtKrw').value||'').replace(/,/g,''));
+  $('#amtAed').value=isNaN(k)?'':(k/rate.val).toFixed(2).replace(/\.00$/,'');
+}
+
+/* ================= data layer ================= */
+const DB={mode:'local', places:[], notes:[], ck:[], ready:false, busy:false};
+function lsGet(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+
+function sbHeaders(extra){
+  const h={apikey:SUPA_KEY, Authorization:'Bearer '+SUPA_KEY};
+  if(extra) for(const k in extra) h[k]=extra[k];
+  return h;
+}
+async function sb(path,opt){
+  opt=opt||{};
+  const r=await fetch(SUPA+'/rest/v1/'+path,{method:opt.method||'GET',headers:sbHeaders(opt.headers||{}),body:opt.body});
+  if(!r.ok){ const t=await r.text(); const e=new Error('HTTP '+r.status+' '+t.slice(0,160)); e.status=r.status; e.body=t; throw e; }
+  if(r.status===204) return null;
+  const t=await r.text();
+  return t?JSON.parse(t):null;
+}
+async function sbInsert(table,row){
+  const d=await sb(table,{method:'POST',headers:{'Content-Type':'application/json',Prefer:'return=representation'},body:JSON.stringify(row)});
+  return Array.isArray(d)?d[0]:d;
+}
+async function sbPatch(table,id,row){
+  const d=await sb(table+'?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:{'Content-Type':'application/json',Prefer:'return=representation'},body:JSON.stringify(row)});
+  return Array.isArray(d)?d[0]:d;
+}
+async function sbDelete(table,id){
+  await sb(table+'?id=eq.'+encodeURIComponent(id),{method:'DELETE',headers:{Prefer:'return=minimal'}});
+}
+function missingTable(e){ return e && (e.status===404 || /PGRST205|42P01|does not exist/.test(e.body||'') || /relation/i.test(e.body||'')); }
+
+function localId(items){ return items.reduce((m,x)=>Math.max(m,+x.id||0),0)+1; }
+
+async function initDB(){
+  try{
+    await sb('dubai_places?select=id&limit=1');
+    DB.mode='cloud';
+  }catch(e){
+    DB.mode = missingTable(e)?'local':'local';
+    if(missingTable(e)) console.warn('tables missing → local mode');
+    else console.warn('supabase error → local mode', e.message);
+  }
+  $('#banner').hidden = DB.mode==='cloud';
+  if(DB.mode==='local'){
+    $('#banner').innerHTML='<b>지금은 이 기기에만 저장 중</b>이에요. 서버(Supabase) 테이블이 연결되면 자동으로 건우 님과 공유돼요. 등록한 내용은 사라지지 않게 기기에 보관돼 있어요.';
+  }
+  await refreshAll(true);
+  DB.ready=true;
+}
+
+async function refreshAll(first){
+  if(DB.busy) return; DB.busy=true;
+  try{
+    if(DB.mode==='cloud'){
+      const [p,n,k]=await Promise.all([
+        sb('dubai_places?select=*&order=created_at.asc'),
+        sb('dubai_notes?select=*&order=created_at.asc&limit=400'),
+        sb('dubai_checklist?select=*&order=id.asc')
+      ]);
+      DB.places=p||[]; DB.notes=n||[]; DB.ck=k||[];
+      if(!DB.ck.length){ await seedChecklist(); }
+    } else {
+      DB.places=lsGet('dubai.places',[]); DB.notes=lsGet('dubai.notes',[]); DB.ck=lsGet('dubai.ck',[]);
+      if(!DB.ck.length){ DB.ck=CK_DEFAULT.map((x,i)=>({id:i+1,label:x[0],done:x[1],author:'기본'})); lsSet('dubai.ck',DB.ck); }
+      lsSet('dubai.places',DB.places); lsSet('dubai.notes',DB.notes);
+    }
+    renderAll(first);
+  }catch(e){
+    console.warn('refresh failed',e.message);
+  }finally{ DB.busy=false; }
+}
+async function seedChecklist(){
+  const rows=CK_DEFAULT.map(x=>({label:x[0],done:x[1],author:'기본'}));
+  const saved=await sb('dubai_checklist',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'return=representation'},body:JSON.stringify(rows)});
+  DB.ck=Array.isArray(saved)?saved:[];
+}
+
+function renderAll(first){
+  renderPlaces(); renderHomePlaces(); renderMapPins(); renderChecklist(); renderChat(); renderAlbum(); renderTaxi();
+  if(first){ paintWho(); }
+}
+
+/* ================= places ================= */
+const placesUI={cat:'all', editing:null};
+function catOf(c){ return CATS[c]||CATS['관광']; }
+function sortPlaces(list){
+  return list.slice().sort((a,b)=>{
+    const ac=(a.category==='숙소'?0:a.category==='출장지'?1:2), bc=(b.category==='숙소'?0:b.category==='출장지'?1:2);
+    if(ac!==bc) return ac-bc;
+    return String(a.start_at||'9')<String(b.start_at||'9')?-1:1;
+  });
+}
+function placeCard(p,compact){
+  const c=catOf(p.category);
+  const when=whenText(p.start_at,p.end_at);
+  return '<div class="pl" data-id="'+esc(p.id)+'">'
+    +'<div class="ico" style="background:'+c.bg+';border-color:'+c.bd+'">'+c.e+'</div>'
+    +'<div class="bd">'
+    +'<div class="nm">'+esc(p.name)+'<span class="tag" style="background:'+c.bg+';color:'+c.c+';border:1px solid '+c.bd+'">'+esc(p.category)+'</span></div>'
+    +(p.address?'<div class="ad">'+esc(p.address)+'</div>':'')
+    +(when?'<div class="mt">🕒 '+esc(when)+'</div>':'')
+    +(p.booking_ref?'<div class="mt">🎫 '+esc(p.booking_ref)+'</div>':'')
+    +(p.memo?'<div class="mm">'+esc(p.memo).replace(/\n/g,'<br>')+'</div>':'')
+    +'<div class="acts">'
+      +'<a class="ia blue" href="'+mapsLink(p)+'" target="_blank" rel="noopener">🧭 길찾기</a>'
+      +'<button class="ia gold" data-taxi="'+esc(p.id)+'">🚕 택시 카드</button>'
+      +(compact?'':'<button class="ia" data-edit="'+esc(p.id)+'">수정</button><button class="ia red" data-del="'+esc(p.id)+'">삭제</button>')
+    +'</div></div></div>';
+}
+function renderPlaces(){
+  const list=sortPlaces(DB.places);
+  const fil=placesUI.cat==='all'?list:list.filter(p=>p.category===placesUI.cat);
+  $('#placeCnt').textContent=list.length?list.length+'곳 등록':'';
+  const el=$('#placeList');
+  if(!fil.length){
+    el.innerHTML='<div class="card empty"><div class="big">📍</div>'+(list.length?'이 구분에 등록된 장소가 없어요.':'아직 등록한 장소가 없어요.<br>숙소·출장지부터 추가해 보세요.')+'</div>';
+  } else {
+    el.innerHTML=fil.map(p=>placeCard(p,false)).join('');
+  }
+  $('#recList').innerHTML=RECS.map((r,i)=>'<button class="rec" data-rec="'+i+'">+ '+esc(r.name)+'</button>').join('');
+}
+function renderHomePlaces(){
+  const pick=DB.places.filter(p=>p.category==='숙소'||p.category==='출장지');
+  const list=sortPlaces(pick.length?pick:DB.places).slice(0,3);
+  const el=$('#homePlaces');
+  if(!list.length){
+    el.innerHTML='<div class="card empty"><div class="big">🏨</div>숙소·출장지를 등록하면<br>지도·택시 카드·길찾기에 바로 떠요.<br><button class="mini" data-goto="places" style="margin-top:10px">장소 등록하러 가기</button></div>';
+  } else {
+    el.innerHTML=list.map(p=>placeCard(p,true)).join('');
+  }
+}
+
+function defaultPins(){
+  return [{id:'airport',name:AIRPORT.name,address:AIRPORT.addr,lat:AIRPORT.lat,lng:AIRPORT.lng,category:'공항'}];
+}
+
+/* ---- place sheet ---- */
+function openPlaceSheet(place, presetCat){
+  placesUI.editing = place? {...place} : null;
+  $('#psTitle').textContent = place?'장소 수정':'장소 추가';
+  $('#psDel').hidden = !place;
+  $('#psName').value = place?place.name:'';
+  $('#psAddr').value = place?place.address||'':'';
+  $('#psLat').value = place&&place.lat!=null?place.lat:'';
+  $('#psLng').value = place&&place.lng!=null?place.lng:'';
+  $('#psStart').value = isoLocal(place&&place.start_at);
+  $('#psEnd').value = isoLocal(place&&place.end_at);
+  $('#psMemo').value = place?place.memo||'':'';
+  $('#psGeoRes').innerHTML='';
+  const cat=(place&&place.category)||presetCat||'숙소';
+  $$('#psCat button').forEach(b=>b.classList.toggle('on',b.dataset.cat===cat));
+  $('#placeSheet').hidden=false;
+  setTimeout(()=>{ try{ $('#psName').focus(); }catch(e){} },120);
+}
+function closePlaceSheet(){ $('#placeSheet').hidden=true; placesUI.editing=null; saving(false); }
+
+async function geocode(q){
+  const box=$('#psGeoRes');
+  box.innerHTML='<div class="muted" style="padding:4px 2px"><span class="spin"></span> 주소 검색 중…</div>';
+  try{
+    const u='https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&accept-language=ko,en&q='+encodeURIComponent(q);
+    const r=await fetch(u,{headers:{'Accept':'application/json'}});
+    if(!r.ok) throw new Error('geocode '+r.status);
+    const arr=await r.json();
+    if(!arr.length){ box.innerHTML='<div class="muted" style="padding:4px 2px">검색 결과가 없어요. 주소를 더 구체적으로 쓰거나 좌표를 직접 넣어 주세요.</div>'; return; }
+    box.innerHTML=arr.map((x,i)=>{
+      const nm=(x.name||x.display_name||'').split(',')[0];
+      return '<button data-geo="'+i+'"><b>'+esc(nm)+'</b>'+esc((x.display_name||'').slice(0,90))+'</button>';
+    }).join('');
+    box._res=arr;
+  }catch(e){
+    box.innerHTML='<div class="muted" style="padding:4px 2px">주소 검색에 실패했어요. 좌표를 직접 입력해 주세요.</div>';
+  }
+}
+
+async function savePlace(){
+  const name=$('#psName').value.trim();
+  if(!name){ toast('장소명을 넣어 주세요'); $('#psName').focus(); return; }
+  const cat=($$('#psCat button').find(b=>b.classList.contains('on'))||{}).dataset?.cat||'관광';
+  const row={
+    category:cat, name:name,
+    address:$('#psAddr').value.trim()||null,
+    lat:$('#psLat').value!==''?parseFloat($('#psLat').value):null,
+    lng:$('#psLng').value!==''?parseFloat($('#psLng').value):null,
+    start_at:$('#psStart').value||null,
+    end_at:$('#psEnd').value||null,
+    memo:$('#psMemo').value.trim()||null,
+    author:who.name||null
+  };
+  saving(true);
+  try{
+    if(placesUI.editing && placesUI.editing.id){
+      const id=placesUI.editing.id;
+      if(DB.mode==='cloud'){ const upd=await sbPatch('dubai_places',id,row); }
+      const i=DB.places.findIndex(x=>String(x.id)===String(id));
+      if(i>=0) DB.places[i]=Object.assign({},DB.places[i],row);
+      if(DB.mode!=='cloud') lsSet('dubai.places',DB.places);
+      toast('수정했어요');
+    } else {
+      if(DB.mode==='cloud'){
+        const ins=await sbInsert('dubai_places',row);
+        DB.places.push(ins);
+      } else {
+        row.id=localId(DB.places); DB.places.push(row); lsSet('dubai.places',DB.places);
+      }
+      toast('추가했어요'+(DB.mode==='cloud'?' · 건우 님 화면에도 곧 떠요':''));
+    }
+    closePlaceSheet();
+    renderAll(false);
+  }catch(e){
+    console.warn(e); toast('저장 실패: '+(e.message||'').slice(0,40));
+  }finally{ saving(false); }
+}
+async function deletePlace(id){
+  if(!confirm('이 장소를 삭제할까요?')) return;
+  try{
+    if(DB.mode==='cloud') await sbDelete('dubai_places',id);
+    DB.places=DB.places.filter(x=>String(x.id)!==String(id));
+    if(DB.mode!=='cloud') lsSet('dubai.places',DB.places);
+    closePlaceSheet(); renderAll(false); toast('삭제했어요');
+  }catch(e){ toast('삭제 실패: '+(e.message||'').slice(0,40)); }
+}
+
+/* ================= map ================= */
+const mapState={map:null, layer:null, ready:false};
+function initMap(){
+  if(mapState.map) return;
+  const m=L.map('map',{zoomControl:true, scrollWheelZoom:false, attributionControl:true});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+    maxZoom:19, subdomains:'abcd',
+    attribution:'&copy; OpenStreetMap &copy; CARTO'
+  }).addTo(m);
+  m.setView([25.2048,55.2708],11);
+  mapState.map=m; mapState.layer=L.layerGroup().addTo(m);
+  renderMapPins(true);
+}
+function pinIcon(cat){
+  const c = cat==='공항' ? {e:'✈️',c:'#d9dde3'} : catOf(cat);
+  const col = cat==='공항' ? '#d9dde3' : c.c;
+  return L.divIcon({
+    className:'', iconSize:[30,30], iconAnchor:[15,28], popupAnchor:[0,-24],
+    html:'<div class="pin" style="background:'+col+'"><span style="font-size:13px">'+c.e+'</span></div>'
+  });
+}
+function renderMapPins(fit){
+  if(!mapState.map) return;
+  const m=mapState.map, layer=mapState.layer;
+  layer.clearLayers();
+  const all=defaultPins().concat(DB.places.filter(p=>p.lat!=null&&p.lng!=null&&p.lat!==''&&p.lng!==''));
+  all.forEach(p=>{
+    const mk=L.marker([+p.lat,+p.lng],{icon:pinIcon(p.category||'관광'),title:p.name});
+    const link=mapsLink(p);
+    mk.bindPopup('<b>'+esc(p.name)+'</b><br>'+(p.address?esc(p.address)+'<br>':'')
+      +'<a href="'+link+'" target="_blank" rel="noopener">🧭 Google 길찾기</a>');
+    mk.addTo(layer);
+  });
+  $('#mapCnt').textContent=DB.places.length?DB.places.length+'곳 + 공항':'공항 기준';
+  if(fit){
+    if(all.length===1) m.setView([+all[0].lat,+all[0].lng],12);
+    else m.fitBounds(all.map(p=>[+p.lat,+p.lng]),{padding:[36,36],maxZoom:13});
+  }
+}
+
+/* ================= checklist ================= */
+function renderChecklist(){
+  const list=DB.ck||[];
+  const done=list.filter(x=>x.done).length;
+  $('#ckCnt').textContent=done+'/'+list.length;
+  $('#ckBar').style.width=(list.length?(done/list.length*100):0)+'%';
+  $('#ckList').innerHTML=list.map(x=>'<div class="ck-row '+(x.done?'on':'')+'" data-ck="'+esc(x.id)+'">'
+    +'<div class="ck-box">✓</div><div class="lb">'+esc(x.label)+'</div><button class="x" data-ckdel="'+esc(x.id)+'">✕</button></div>').join('');
+}
+async function toggleCk(id){
+  const it=DB.ck.find(x=>String(x.id)===String(id)); if(!it) return;
+  it.done=!it.done; renderChecklist();
+  try{
+    if(DB.mode==='cloud') await sbPatch('dubai_checklist',id,{done:it.done});
+    else lsSet('dubai.ck',DB.ck);
+  }catch(e){ toast('저장 실패'); }
+}
+async function addCk(){
+  const v=$('#ckInput').value.trim(); if(!v) return;
+  const row={label:v,done:false,author:who.name||null};
+  try{
+    if(DB.mode==='cloud'){ const ins=await sbInsert('dubai_checklist',row); DB.ck.push(ins); }
+    else { row.id=localId(DB.ck); DB.ck.push(row); lsSet('dubai.ck',DB.ck); }
+    $('#ckInput').value=''; renderChecklist();
+  }catch(e){ toast('추가 실패'); }
+}
+async function delCk(id){
+  try{
+    if(DB.mode==='cloud') await sbDelete('dubai_checklist',id);
+    DB.ck=DB.ck.filter(x=>String(x.id)!==String(id));
+    if(DB.mode!=='cloud') lsSet('dubai.ck',DB.ck);
+    renderChecklist();
+  }catch(e){ toast('삭제 실패'); }
+}
+
+/* ================= who ================= */
+const who={name:''};
+function loadWho(){
+  try{ who.name=sessionStorage.getItem('dubai.who')||''; }catch(e){}
+  paintWho();
+}
+function paintWho(){
+  $('#whoTxt').textContent=who.name||'누구세요?';
+}
+function askWho(cb){
+  if(who.name){ if(cb) cb(); return true; }
+  who._pending=cb||null;
+  $('#whoSheet').hidden=false;
+  return false;
+}
+function setWho(n){
+  who.name=n;
+  try{ sessionStorage.setItem('dubai.who',n); }catch(e){}
+  paintWho(); $('#whoSheet').hidden=true;
+  const cb=who._pending; who._pending=null;
+  toast(n+' 님으로 기록할게요');
+  if(cb) setTimeout(cb,120);
+}
+
+/* ================= notes / chat ================= */
+function compressImage(file){
+  return new Promise((resolve,reject)=>{
+    const MAX=1400,Q=0.82, url=URL.createObjectURL(file), img=new Image();
+    let done=false;
+    const fail=m=>{ if(done) return; done=true; URL.revokeObjectURL(url); reject(new Error(m)); };
+    img.onload=()=>{
+      try{
+        let w=img.naturalWidth||img.width, h=img.naturalHeight||img.height;
+        if(!w||!h) return fail('사진을 읽지 못했어요');
+        const sc=Math.min(1,MAX/Math.max(w,h));
+        w=Math.max(1,Math.round(w*sc)); h=Math.max(1,Math.round(h*sc));
+        const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+        const g=cv.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,w,h); g.drawImage(img,0,0,w,h);
+        cv.toBlob(b=>{ if(!b) return fail('사진 변환 실패'); if(done) return; done=true; URL.revokeObjectURL(url); resolve(b); },'image/jpeg',Q);
+      }catch(e){ fail('사진 처리 실패'); }
+    };
+    img.onerror=()=>fail('이 사진은 브라우저에서 열 수 없어요 (JPG·PNG)');
+    img.src=url;
+  });
+}
+async function uploadPhoto(blob){
+  const path='chat/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.jpg';
+  const r=await fetch(SUPA+'/storage/v1/object/'+BUCKET+'/'+path,{
+    method:'POST',
+    headers:sbHeaders({'Content-Type':'image/jpeg','cache-control':'31536000','x-upsert':'false'}),
+    body:blob
+  });
+  if(!r.ok){ const t=await r.text(); throw new Error('사진 업로드 실패 ('+r.status+')'); }
+  return SUPA+'/storage/v1/object/public/'+BUCKET+'/'+path;
+}
+function tmText(v){
+  const d=new Date(v); if(isNaN(d)) return '';
+  const now=new Date();
+  const same=d.toDateString()===now.toDateString();
+  return same? pad(d.getHours())+':'+pad(d.getMinutes()) : (d.getMonth()+1)+'/'+d.getDate()+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+}
+function renderChat(){
+  const box=$('#chatList');
+  const list=(DB.notes||[]).slice(-120);
+  if(!list.length){
+    box.innerHTML='<div class="empty" style="padding:14px"><div class="big">💌</div>첫 메모를 남겨 보세요.<br>두바이에서도, 집에서도 같은 화면이에요.</div>';
+    return;
+  }
+  box.innerHTML=list.map(n=>{
+    const me=who.name && n.author===who.name;
+    return '<div class="msg '+(me?'me':'')+'">'
+      +'<div class="who-s">'+esc(n.author||'익명')+'</div>'
+      +(n.image_url?'<img class="pic" src="'+esc(n.image_url)+'" alt="사진" data-lb="'+esc(n.image_url)+'" loading="lazy">':'')
+      +(n.body?'<div class="bb">'+esc(n.body)+'</div>':'')
+      +'<div class="tm">'+tmText(n.created_at)+(me?' · <button class="del" data-ndel="'+esc(n.id)+'">삭제</button>':'')+'</div>'
+      +'</div>';
+  }).join('');
+  box.scrollTop=box.scrollHeight;
+}
+function renderAlbum(){
+  const pics=(DB.notes||[]).filter(n=>n.image_url);
+  $('#albumEmpty').hidden=!!pics.length;
+  $('#albumGrid').innerHTML=pics.slice().reverse().map(n=>'<button data-lb="'+esc(n.image_url)+'"><img src="'+esc(n.image_url)+'" alt="사진" loading="lazy"></button>').join('');
+}
+let sending=false;
+async function sendNote(){
+  if(sending) return;
+  if(!askWho(sendNote)) return;
+  const input=$('#chatInput');
+  const body=input.value.trim();
+  const file=($('#chatFile').files||[])[0]||null;
+  if(!body && !file){ toast('메시지나 사진을 넣어 주세요'); input.focus(); return; }
+  sending=true;
+  const btn=$('#chatSend'); btn.disabled=true; btn.textContent='…';
+  try{
+    let url=null;
+    if(file){ url=await uploadPhoto(await compressImage(file)); }
+    const row={author:who.name||'익명', body:body||null, image_url:url};
+    if(DB.mode==='cloud'){ const ins=await sbInsert('dubai_notes',row); DB.notes.push(ins); }
+    else { row.id=localId(DB.notes); row.created_at=new Date().toISOString(); DB.notes.push(row); lsSet('dubai.notes',DB.notes); }
+    input.value=''; $('#chatFile').value='';
+    renderChat(); renderAlbum();
+  }catch(e){
+    console.warn(e); toast('전송 실패: '+(e.message||'').slice(0,50));
+  }finally{
+    sending=false; btn.disabled=false; btn.textContent='전송';
+  }
+}
+async function delNote(id){
+  if(!confirm('이 메시지를 삭제할까요?')) return;
+  try{
+    if(DB.mode==='cloud') await sbDelete('dubai_notes',id);
+    DB.notes=DB.notes.filter(n=>String(n.id)!==String(id));
+    if(DB.mode!=='cloud') lsSet('dubai.notes',DB.notes);
+    renderChat(); renderAlbum();
+  }catch(e){ toast('삭제 실패'); }
+}
+
+/* ================= taxi card ================= */
+function renderTaxi(){
+  const list=sortPlaces(DB.places).filter(p=>p.category==='숙소'||p.category==='출장지');
+  $('#taxiEmpty').hidden=!!list.length;
+  $('#taxiList').innerHTML=list.map(p=>'<button class="btn ghost block" style="justify-content:space-between;text-align:left;margin-bottom:7px" data-taxi="'+esc(p.id)+'">'
+    +'<span style="font-weight:800">'+catOf(p.category).e+' '+esc(p.name)+'</span><span class="dim" style="font-size:11px">크게 보기 ›</span></button>').join('');
+}
+function openTaxi(id){
+  const p=DB.places.find(x=>String(x.id)===String(id)) || (String(id)==='airport'?{name:AIRPORT.name,address:AIRPORT.addr,lat:AIRPORT.lat,lng:AIRPORT.lng}:null);
+  if(!p) return;
+  $('#tcName').textContent=p.name||'';
+  $('#tcAddr').textContent=p.address||'주소를 등록하지 않았어요';
+  $('#tcLL').textContent=(p.lat!=null&&p.lng!=null)?('위도 '+p.lat+' · 경도 '+p.lng):'';
+  $('#taxiSheet').hidden=false;
+}
+
+/* ================= nav ================= */
+function go(page){
+  const map={home:'#pgHome',places:'#pgPlaces',map:'#pgMap',couple:'#pgCouple',extra:'#pgExtra'};
+  Object.keys(map).forEach(k=>{ const s=$(map[k]); if(s) s.hidden=(k!==page); });
+  $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.pg===page));
+  if(page==='map'){
+    if(!mapState.map) initMap();
+    setTimeout(()=>{ try{ mapState.map.invalidateSize(); renderMapPins(true); }catch(e){} },80);
+  }
+  window.scrollTo({top:0,behavior:'instant'});
+}
+
+/* ================= phrases ================= */
+function renderPhrases(){
+  $('#phraseBox').innerHTML=PHRASES.map((p,i)=>'<div class="phrase" data-phr="'+i+'">'
+    +'<div class="ko">'+esc(p.ko)+'</div>'
+    +'<div class="ar">'+esc(p.ar)+'</div>'
+    +'<div class="ro">'+esc(p.ro)+'</div>'
+    +'<div class="cp">복사</div></div>').join('');
+}
+async function copyText(t){
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(t);
+    else { const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+    toast('복사했어요');
+  }catch(e){ toast('복사가 안 됐어요 — 길게 눌러 선택해 주세요'); }
+}
+
+/* ================= events ================= */
+function bind(){
+  $('#whoBtn').onclick=()=>{ $('#whoSheet').hidden=false; };
+  $$('#whoSheet [data-who]').forEach(b=>b.onclick=()=>setWho(b.dataset.who));
+
+  $$('#nav button').forEach(b=>b.onclick=()=>go(b.dataset.pg));
+  document.body.addEventListener('click',e=>{
+    const g=e.target.closest('[data-goto]'); if(g){ go(g.dataset.goto); return; }
+    const rec=e.target.closest('[data-rec]'); if(rec){ addRec(+rec.dataset.rec); return; }
+    const ed=e.target.closest('[data-edit]'); if(ed){ const p=DB.places.find(x=>String(x.id)===ed.dataset.edit); if(p) openPlaceSheet(p); return; }
+    const dl=e.target.closest('[data-del]'); if(dl){ deletePlace(dl.dataset.del); return; }
+    const tx=e.target.closest('[data-taxi]'); if(tx){ openTaxi(tx.dataset.taxi); return; }
+    const ck=e.target.closest('[data-ck]'); if(ck && !e.target.closest('[data-ckdel]')){ toggleCk(ck.dataset.ck); return; }
+    const ckd=e.target.closest('[data-ckdel]'); if(ckd){ delCk(ckd.dataset.ckdel); return; }
+    const nd=e.target.closest('[data-ndel]'); if(nd){ delNote(nd.dataset.ndel); return; }
+    const ph=e.target.closest('[data-phr]'); if(ph){ copyText(PHRASES[+ph.dataset.phr].ar); return; }
+    const lb=e.target.closest('[data-lb]'); if(lb){ $('#lbImg').src=lb.dataset.lb; $('#lightbox').hidden=false; return; }
+    const chip=e.target.closest('#placeFilters .chip'); if(chip){ $$('#placeFilters .chip').forEach(c=>c.classList.toggle('on',c===chip)); placesUI.cat=chip.dataset.cat; renderPlaces(); return; }
+    const ctab=e.target.closest('[data-ctab]'); if(ctab){ $$('[data-ctab]').forEach(c=>c.classList.toggle('on',c===ctab)); $('#ctChat').hidden=ctab.dataset.ctab!=='chat'; $('#ctAlbum').hidden=ctab.dataset.ctab!=='album'; return; }
+  });
+
+  $('#addPlaceTop').onclick=()=>openPlaceSheet(null);
+  $('#psClose').onclick=closePlaceSheet;
+  $('#psSave').onclick=savePlace;
+  $('#psDel').onclick=()=>{ if(placesUI.editing) deletePlace(placesUI.editing.id); };
+  $$('#psCat button').forEach(b=>b.onclick=()=>{ $$('#psCat button').forEach(x=>x.classList.toggle('on',x===b)); });
+  $('#psSearch').onclick=()=>{
+    const q=($('#psAddr').value||'').trim()||($('#psName').value||'').trim();
+    if(!q){ toast('주소나 장소명을 먼저 입력해 주세요'); return; }
+    geocode(q);
+  };
+  $('#psAddr').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $('#psSearch').click(); } });
+  $('#psGeoRes').addEventListener('click',e=>{
+    const b=e.target.closest('[data-geo]'); if(!b) return;
+    const arr=$('#psGeoRes')._res||[]; const x=arr[+b.dataset.geo]; if(!x) return;
+    $('#psLat').value=(+x.lat).toFixed(6);
+    $('#psLng').value=(+x.lon).toFixed(6);
+    $('#psAddr').value=(x.display_name||'').slice(0,157);
+    if(!$('#psName').value.trim()) $('#psName').value=(x.name||x.display_name||'').split(',')[0].slice(0,60);
+    $('#psGeoRes').innerHTML='<div class="muted" style="padding:4px 2px;color:#5fd39a">✓ 좌표를 채웠어요 ('+(+x.lat).toFixed(5)+', '+(+x.lon).toFixed(5)+')</div>';
+  });
+
+  $('#tcClose').onclick=()=>{ $('#taxiSheet').hidden=true; };
+  $('#taxiSheet').addEventListener('click',e=>{ if(e.target.id==='taxiSheet') $('#taxiSheet').hidden=true; });
+  $('#placeSheet').addEventListener('click',e=>{ if(e.target.id==='placeSheet') closePlaceSheet(); });
+  $('#whoSheet').addEventListener('click',e=>{ if(e.target.id==='whoSheet'){ $('#whoSheet').hidden=true; who._pending=null; } });
+  $('#lbClose').onclick=()=>{ $('#lightbox').hidden=true; };
+  $('#lightbox').onclick=e=>{ if(e.target.id==='lightbox') $('#lightbox').hidden=true; };
+
+  $('#ckAdd').onclick=addCk;
+  $('#ckInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); addCk(); } });
+
+  $('#amtAed').addEventListener('input',convAed2Krw);
+  $('#amtKrw').addEventListener('input',convKrw2Aed);
+  $('#moneySwap').onclick=()=>{
+    const k=parseFloat(($('#amtKrw').value||'').replace(/,/g,''));
+    if(!isNaN(k) && k>0){ $('#amtAed').value=(k/rate.val).toFixed(2); convAed2Krw(); }
+    else { $('#amtKrw').value=''; $('#amtKrw').focus(); }
+  };
+  $$('.quick button').forEach(b=>b.onclick=()=>{ $('#amtAed').value=b.dataset.aed; convAed2Krw(); });
+  $('#rateEdit').onclick=()=>{
+    const v=prompt('1 AED = ? KRW (직접 입력, 비우면 실시간으로 복귀)', rate.val.toFixed(2));
+    if(v===null) return;
+    if(!v.trim()){ try{ localStorage.removeItem('dubai.rate'); }catch(e){} rate.manual=false; rate.src='실시간'; loadRate(); return; }
+    const n=parseFloat(v.replace(/,/g,''));
+    if(!n||n<=0){ toast('숫자를 넣어 주세요'); return; }
+    rate.val=n; rate.manual=true; rate.src='직접 설정';
+    try{ localStorage.setItem('dubai.rate',JSON.stringify({val:n})); }catch(e){}
+    paintRate(); toast('환율을 '+n+'원으로 고정했어요');
+  };
+
+  $('#chatSend').onclick=sendNote;
+  $('#chatInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); sendNote(); } });
+  $('#chatPhoto').onclick=()=>{ if(!askWho()) return; $('#chatFile').click(); };
+  $('#chatFile').addEventListener('change',()=>{ if($('#chatFile').files.length) toast('사진을 골랐어요 — 전송을 눌러 주세요'); });
+}
+
+async function addRec(i){
+  const r=RECS[i]; if(!r) return;
+  try{
+    const row={category:r.cat,name:r.name,address:r.addr,lat:r.lat,lng:r.lng,memo:null,author:who.name||null};
+    if(DB.mode==='cloud'){ const ins=await sbInsert('dubai_places',row); DB.places.push(ins); }
+    else { row.id=localId(DB.places); DB.places.push(row); lsSet('dubai.places',DB.places); }
+    renderAll(false); toast(r.name+' 추가했어요');
+  }catch(e){ toast('추가 실패: '+(e.message||'').slice(0,40)); }
+}
+
+/* ================= boot ================= */
+function boot(){
+  $('#heroSteps').innerHTML=buildSteps();
+  $('#heroSteps').style.gridTemplateColumns='repeat(2,1fr)';
+  tickClock(); setInterval(tickClock,1000);
+  loadWho(); renderPhrases(); bind();
+  loadWeather(); loadRate();
+  initDB();
+  setInterval(()=>{ if(document.visibilityState==='visible') refreshAll(false); },20000);
+  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') refreshAll(false); });
+  setInterval(()=>{ if(DB.mode!=='cloud') initDB(); },60000);
+  if('serviceWorker' in navigator){ window.addEventListener('load',()=>{ navigator.serviceWorker.register('./sw.js').catch(()=>{}); }); }
+}
+document.addEventListener('DOMContentLoaded',boot);
+</script>
+</body>
+</html>
