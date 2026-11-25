@@ -1250,9 +1250,12 @@ function initMap(){
   if(mapState.map) return;
   if(typeof L==='undefined'){ $('#map').innerHTML='<div class="empty" style="padding:40px 16px"><div class="big">🗺️</div>지도 라이브러리를 불러오지 못했어요.<br>인터넷 연결을 확인하고 새로고침해 주세요.</div>'; return; }
   const m=L.map('map',{zoomControl:true, scrollWheelZoom:false, attributionControl:true});
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
-    maxZoom:19, subdomains:'abcd',
-    attribution:'&copy; OpenStreetMap &copy; CARTO'
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{
+    maxZoom:16, maxNativeZoom:16,
+    attribution:'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
+  }).addTo(m);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',{
+    maxZoom:16, maxNativeZoom:16
   }).addTo(m);
   m.setView([25.2048,55.2708],11);
   mapState.map=m; mapState.layer=L.layerGroup().addTo(m);
