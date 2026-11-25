@@ -1842,6 +1842,8 @@ async function askArabman(q){
   ai.history.push({role:'user',content:text});
   ai.busy=true; aiRender();
   $('#aiSend').disabled=true;
+  const ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
+  const tid=ctrl?setTimeout(()=>{ try{ ctrl.abort(); }catch(e){} },45000):null;
   try{
     const r=await fetch(AI_URL,{
       method:'POST',
@@ -1849,7 +1851,8 @@ async function askArabman(q){
       body:JSON.stringify({
         messages:ai.history.slice(-8).map(m=>({role:m.role,content:m.content})),
         context:aiCtx()
-      })
+      }),
+      signal:ctrl?ctrl.signal:undefined
     });
     const d=await r.json().catch(()=>({}));
     if(!r.ok || !d.ok || !d.reply){
@@ -1860,8 +1863,10 @@ async function askArabman(q){
       ai.history.push({role:'assistant',content:d.reply,meta:mm});
     }
   }catch(e){
-    ai.history.push({role:'assistant',content:'연결이 끊겼어 😅 잠시 뒤 다시 물어봐 줄래?',meta:String(e.message||'').slice(0,80)});
+    const slow=(e&&e.name==='AbortError');
+    ai.history.push({role:'assistant',content:slow?'아랍맨이 답을 찾다가 너무 늦어졌어 😅 다시 한 번 물어봐 줄래?':'연결이 끊겼어 😅 잠시 뒤 다시 물어봐 줄래?',meta:String(e.message||'').slice(0,80)});
   }finally{
+    if(tid) clearTimeout(tid);
     ai.busy=false; $('#aiSend').disabled=false; aiRender();
   }
 }
