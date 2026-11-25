@@ -25,18 +25,21 @@
 10. **아랍어 생존 문구 10종 — `🔊` 발음 듣기** (생존 탭) — 고정 문구마다 아랍어 원문·로마자 발음·복사·`🔊` 버튼. 음성은 레포에 박제된 MP3(`assets/audio/phrase-01.mp3`~`phrase-10.mp3`, `ar-AE-HamdanNeural`)를 재생하고, MP3 로드가 실패하면 서버 TTS로 이어서 재생한다(마지막에만 `speechSynthesis`).
 11. **실시간 번역기** (생존 탭 하단) — 한국어/영어 입력 → 아랍어 원문(로마자 발음)·영어 표현·현지 한 줄 팁. `dubai-ai` 함수에 `mode:'translate'`로 보내고 프론트 `parseTrJSON()`이 파싱한다. 결과는 `🔊 듣기` · `복사` · `다시`, 같은 문장은 `localStorage`에 캐시.
     - `🔊 듣기`는 **서버 TTS**(`mode:'tts'`)로 받은 아랍어 오디오를 재생한다 — 기기에 아랍어 음성팩이 없어도 소리가 난다. 버튼은 `⏳ 준비 중…` → `⏸ 멈추기`로 바뀌고, 받은 오디오는 문장별 메모리 캐시(최대 12개 blob URL)라 다시 누르면 즉시 재생된다. 실패했을 때만 "다시 눌러 주세요" 토스트가 뜬다.
+12. **두바이 쇼핑 · 선물 체크 보드** (쇼핑 탭) — 품목명·카테고리(초콜릿·디저트 / 향수·뷰티 / 면세점 / 기념품·기타)·예상 가격(AED 입력 시 KRW 자동 환산)·수량·메모·요청자 태그(영진 부탁 / 건우 픽)·사진·구매 완료 체크로 위시리스트를 관리한다. 상단 요약은 전체 개수 / 구매 완료 / 예상 총액(AED·KRW), 아래 필터는 카테고리▸남은 것▸산 것. Supabase `dubai_shopping` 테이블에 저장돼 두 기기에서 20초 풀링으로 공유된다.
+13. **아랍맨의 선물 추천 팁 — 60초마다 자동 갱신** (쇼핑 탭 상단) — `dubai-ai` 함수의 `mode:'gift_tip'`을 호출해 품목명·예상 가격·구매처·아랍맨 반말 한 줄을 받아 카드로 띄운다. 이미 보여준 품목(최근 14개)과 위시리스트 품목을 프롬프트에 넣어 중복을 피하고, 60초 카운트다운 후 자동 교체된다(탭을 벗어나거나 화면이 꺼지면 멈추고, 중복 호출은 가드). `↻ 다른 추천`으로 즉시 새로 받을 수 있고 `＋ 위시리스트에 담기`를 누르면 그 품목이 보드에 바로 추가된다. 호출이 실패하면 큐레이션된 오프라인 추천 12종으로 대체해 카드가 비지 않는다.
 
 ## Supabase
 - Project ref와 키는 `index.html` 상단 `SUPA`, `SUPA_KEY` 상수에 있다. **Publishable 키만** 프론트에 쓰고 Secret Key는 절대 넣지 않는다.
 - 스키마·RLS·Storage 정책: [`supabase/schema.sql`](supabase/schema.sql)
-  - 테이블 `dubai_places`, `dubai_notes`, `dubai_checklist` (RLS: anon/authenticated 전체 허용 — 두 사람만 아는 링크 공유 전제)
+  - 테이블 `dubai_places`, `dubai_notes`, `dubai_checklist`, `dubai_shopping` (RLS: anon/authenticated 전체 허용 — 두 사람만 아는 링크 공유 전제)
   - Storage 버킷 `dubai-photos` (public, 읽기/쓰기/삭제 정책 포함)
 - 테이블이 없거나 연결이 안 되면 사이트는 자동으로 **이 기기 저장(localStorage)** 모드로 떨어지고 상단에 안내 배너가 뜬다.
 
 ## Edge Function `dubai-ai`
 - `supabase/functions/dubai-ai/index.ts` (Deno, `verify_jwt: false`, CORS `*`)
 - `GEMINI_API_KEY`는 Supabase 프로젝트 Secrets에만 등록한다(코드·저장소 금지).
-- `mode` 세 갈래: 없음/`chat`(아랍맨 상담, 입력 `{messages, context}`), `translate`(번역기, JSON 한 개), `tts`(아랍어 오디오, 입력 `{text, lang?, voice?}`).
+- `mode` 네 갈래: 없음/`chat`(아랍맨 상담, 입력 `{messages, context}`), `translate`(번역기, JSON 한 개), `tts`(아랍어 오디오, 입력 `{text, lang?, voice?}`), `gift_tip`(선물 추천 한 건, 입력 `{seen, wishlist}` → `{ok, tip:{item, price_aed, where, category, tip}}`).
+- `mode:'gift_tip'`은 전용 시스템 프롬프트(temperature 1.05)로 JSON 하나만 받고, 코드펜스·잡설은 `parseLooseJson()`이 잘라낸다. 응답은 실측 0.8~1.4초.
 - 모델: `gemini-3.1-flash-lite` 1순위 → `gemini-3.6-flash` → `gemini-3.5-flash` → `gemini-2.5-flash-lite` → `gemini-2.5-flash`. 1순위가 3.5초 안에 답하지 않으면 다음 모델을 **함께 출발**시키고(먼저 성공한 응답 채택), 한 번 시도는 12초에서 끊는다 — 특정 모델이 503(과부하)일 때 전체가 붙잡히지 않게.
 - `mode:'translate'`는 전용 시스템 프롬프트(걸프 방언 톤, temperature 0.2)로 JSON만 돌려준다.
 - `mode:'tts'` 응답: `{ok, engine, mime, bytes, ms, audio(base64)}` (+ 캐시 hit이면 `cached:true`). 실측 2~3초, 3초 분량 WAV ≈ 180KB(base64 240KB). 같은 텍스트는 함수 인스턴스 메모리에 캐시(≤6MB).
@@ -44,7 +47,7 @@
 
 ## 오디오(`assets/audio/`)
 - 10개 생존 문구의 아랍어 발음 MP3. 생성: `pip install edge-tts` → `edge-tts`의 `ar-AE-HamdanNeural`(rate `-8%`), 24kHz 모노.
-- `sw.js` 셸 캐시(`dubai-shell-v3`)에 포함되어 오프라인에서도 재생된다. 문구를 바꿀 때는 `index.html`의 `PHRASES`와 MP3를 같이 갱신한다.
+- `sw.js` 셸 캐시(`dubai-shell-v4`)에 포함되어 오프라인에서도 재생된다. 문구를 바꿀 때는 `index.html`의 `PHRASES`와 MP3를 같이 갱신한다.
 - `silent.wav` — iOS가 제스처 밖 `play()`를 막는 문제를 피하려고 첫 터치에서 이 무음 파일로 오디오 요소를 미리 열어 두는 용도(50ms).
 - 번역기·MP3 실패 폴백 음성은 서버에서 만든다: **Gemini TTS `gemini-3.8-flash-tts`**(voice `Sadaltager`, `audio/wav` 반환) 1순위 → `gemini-3.8-flash-lite-tts` / `gemini-3.1-flash-tts-preview` / `gemini-2.5-flash-preview-tts`(PCM 24kHz에 WAV 헤더 부착) → 최종 폴백 구글 번역 음성(`translate_tts`, MP3). TTS 모델·보이스는 `GEMINI_TTS_MODEL`·`GEMINI_TTS_VOICE` Secret으로 바꿀 수 있다.
 
@@ -60,6 +63,10 @@
 | `screenshots/07-아랍어-생존문구-발음듣기-MP3.png` | 생존 문구 10개 + 🔊 재생 중(첫 행 하이라이트) |
 | `screenshots/08-실시간-번역기-결과.png` | 실시간 번역기 — 실제 번역 결과(아랍어·로마자·영어·팁) |
 | `screenshots/09-실시간-번역기-서버TTS-듣기-재생중.png` | `🔊 듣기` → 서버 TTS 재생 중(`⏸ 멈추기`) |
+| `screenshots/10-쇼핑보드-아랍맨-선물팁.png` | 쇼핑 탭 — 아랍맨 선물 추천 카드(60초 카운트다운)·요약·필터 |
+| `screenshots/11-쇼핑-품목추가-시트.png` | 품목 추가 시트(카테고리·AED→KRW·수량·요청자·사진) |
+| `screenshots/12-쇼핑보드-위시리스트-담기.png` | 위시리스트에 담기 → 보드·요약(개수·완료·총액 AED/KRW) 반영 |
+| `screenshots/13-쇼핑보드-수정-요약금액.png` | 품목 수정(70 AED ×2)·요청자 태그·사진·합계 320 AED |
 
 ## 수정·배포
 ```bash
